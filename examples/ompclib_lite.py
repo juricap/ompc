@@ -30,7 +30,8 @@ def _get_nargout():
         howmany = ord(bytecode[i+4])
         return howmany
     elif instruction == dis.opmap['POP_TOP']:
-        return 0
+        # MATLAB always assumes at least 1 value
+        return 1
     return 1
 
 class marray:
@@ -41,11 +42,38 @@ class marray:
 #     m, n, k = 12, marray(), 'aa'
 #     return (m, n, k)[:2]
 
-# def a(b=None,c=None):
-#  if nargin < 2: c = 1
-#  if not hasattr(locals(), 'koko'): print 2
-#  k(10).lvalue = 12
-#  return (a, b)[:nargout]
+def _get_narginout():
+    """Return how many values the caller is expecting.
+    """
+    import inspect, dis
+    f = inspect.currentframe()
+    nargin = 0
+    innames = co.co_varnames[:f.f_code.co_varnames]
+    print innnames
+    print [ f.f_globals[x] for x in innames ]
+    
+    f = f.f_back.f_back
+    c = f.f_code
+    i = f.f_lasti
+    bytecode = c.co_code
+    instruction = ord(bytecode[i+3])
+    if instruction == dis.opmap['UNPACK_SEQUENCE']:
+        howmany = ord(bytecode[i+4])
+        return hargin, howmany
+    elif instruction == dis.opmap['POP_TOP']:
+        # MATLAB always assumes at least 1 value
+        return nargin, 1
+    return nargin, 1
+
+
+def a(b=None,c=None):
+    nargin, nargout = _get_narginout()
+    if nargin < 2:
+        c = 1
+    k = locals().get('k', marray())
+    k(10).lvalue = 12
+    print nargout
+    return (a, b)[:nargout]
 
 # [(SetLineno, 2),
 #  (LOAD_GLOBAL, 'nargin'),
@@ -96,11 +124,11 @@ class mfunction:
         c = self._c
         
         # all return values must be initialized, for return (retvals)[:nargout]
-        self.__init_retvals(c)
+        # not necessary, the parser has to take care of this
         # check for maximum nargout, insert nargin nargout code
         self.__addnarg(c)
-        # initialize novel variables
-        # insert returns
+        # initialize novel variables, FIXME
+        # insert returns, FIXME
     
     def __init_retvals(self, c):
         c.code[:0] = [(LOAD_GLOBAL,),
@@ -134,9 +162,12 @@ class mfunction:
         This function takes a list of names as parameters and initializes
         all of them to the default empty marray().
         """
-        preamble = []
+        # find location where the test needs to be made
+        # look for (STORE_ATTR, 'lvalue'),
+        for instr, name 
+        body = []
         for name in names:
-            preamble.extend([(LOAD_GLOBAL,'marray'),
+            body.extend([(LOAD_GLOBAL,'marray'),
                              (CALL_FUNCTION,0),
                              (STORE_FAST,'')]
         self._c.code[:0] = preamble
