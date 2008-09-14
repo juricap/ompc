@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}OMPC Matlab&copy;-to-Python compiler.{% endblock %}
+
+{% block meta %}
+    <style>
+        {{ style }}
+        #msg { color: white; font-size: 12px; }
+        #source { text-align: left; }
+        #result { color: yellow; }
+        #warning { font-size: larger; font-weight: bold; color: #ff4040; }
+        form { text-align: center; color: white; }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div>
+    <div id="msg">
+        <p>This is the online version of OMPC, an Open-source MATLAB&copy; 
+        to Python Compiler. Paste an m-file into the area as text, or upload 
+        a file. This file will be translated into Python compatible syntax. 
+        At the moment the OMPC is being tested. Until <b>October 15th 2008</b>
+        we are collecting m-files for the purpose of testing the compiler.
+        This will hopefully allow us to finalize it and remove the last 
+        incomatibilities.
+        </p>
+        <p>At the moment the compiler does not support syntax of the form
+        
+        <b><i>IDENTIFIER var1 var2 -option</i></b>. For example 
+        <i>save var1 var2</i> will fail. You can use 
+        <i>save('var1', 'var2')</i>. The compiler will not complain, it will
+        simply treat the statement as a list of many statements.<br />
+        The rest should work, if not, we will repair it. You don't have to do 
+        anything beyond submiting m-files. It is important for us to collect 
+        as much data files as posisble for testing. The more diffrent styles
+        of coding we see the better.
+        </p>
+        <p id="warning">The files you are uploading will be saved in our
+        database. Please do not upload anything you wouldn't like us to see.</p>
+        <p>In the future this site will host the OMPClib. OMPClib as a Python 
+        module that unifies the packages numpy, scipy and matplotlib
+        under standardized MATLAB interface.
+        </p>
+    </div>
+    <div id="result">
+        {{ message }}
+    </div>
+    <div id="#source">
+        {{ source }}
+    </div>
+    <form enctype="multipart/form-data" action="/m2py" method="post">
+        <div><label for="mfile">M file: </label>
+        <input name="mfile" type="file" size="113" /></div>
+        or enter source code:
+        <div>
+        <textarea name="mtext" rows="25" cols="120" >
+U_ST = @(T_,S_) (L1./S_ + L3.*S_) + (L2./T_ + L4.*T_);       % (1)
+disp(U_ST);
+
+t = logspace(-2,0);
+s = logspace(-2,1);
+[T_0,S_0] = meshgrid(t, s)
+figure(1);
+title('The Spatiotemporal Uncertainty Function.')
+surfc(T_0,S_0,U_ST(T_0,S_0));
+set(gca,'XScale','log'); xlabel('log(temporal distance)');
+set(gca,'YScale','log'); ylabel('log(spatial distance)');
+
+function [out1, out2] = do_nothing(a, b, c, d)
+
+disp Nothing
+for i = 1:10     % preserved comment
+a(1:i) = rand(i,1) %do something
+end
+        </textarea></div>
+        <div><label for="ctext">colorize the syntax</label>
+        <input name="ctext" type="checkbox" checked="checked" /></div>
+        <div><input type="submit" value="Convert"></div>
+    </form>
+    </div>
+{% endblock %}

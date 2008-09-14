@@ -1,0 +1,23 @@
+<html>
+<head>
+    <title>OMPC / {% block title %}{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="/media/css/base.css" />
+    {% block meta %}{% endblock %}
+</head>
+<body>
+    <div id="top"><div id="name"><a href="http://ompc.juricap.com/"><img src="/media/logo_simple_12.png" />ompc</a></div></div>
+    <!--<div id="navi">home > {{ location }}</div><div id="status"> {{ status }}</div>-->
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr><td width="50%"  id="navi">OMPC > {{ location }}</td><td width="50%" id="status"> {{ status }}</td></tr>
+    </table>
+    <div id="container">
+    <div id="content">
+        <div>
+                <div>{{ top }}</div>
+                {% block content %}{% endblock %}
+        </div>
+    </div>
+    
+    </div>
+</body>
+</html> 

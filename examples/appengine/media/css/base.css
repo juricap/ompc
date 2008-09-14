@@ -1,0 +1,45 @@
+html { height: 100%; }
+
+#name { padding: 5 5 5 5; }
+#name img { vertical-align: middle; }
+#top { background: #616467; color: #009ae4; width: 100%; 
+       font: normal normal 2.0em Verdana, 'Lucida Sans Unicode', 
+             'Lucida Grande', sans-serif;
+       padding : 10; }
+
+#navi { display: table-cell; text-align: left; background: #aaa; 
+        color: #e8e8e8; padding: 5 5 5 5; 
+        font: normal normal 0.7em Verdana, 'Lucida Sans Unicode', 
+              'Lucida Grande', sans-serif; }
+#status { display: table-cell; text-align: right; 
+          background: #aaa; color: #e8e8e8; padding: 5 5 5 5; 
+          font: normal normal 0.7em Verdana, 'Lucida Sans Unicode', 
+                'Lucida Grande', sans-serif; }
+
+#content { margin: 15; }
+#content pre.code { padding: 10; }
+
+body
+{
+    background-color: #2d3133;
+    background-image: url(/media/bg.gif);
+    background-position: top;
+    background-repeat: repeat-x;
+    color: #000000;
+    font: 12px Arial, Verdana, sans-serif;
+    height: 100%;
+    margin: 0; padding: 0;
+}
+
+a { color: white; outline: none; text-decoration: none; }
+a:visited { color: #909090; }
+a:hover { color: #dddddd; }
+a:active { color: #aaaaaa; }
+a img { border: 0; }
+
+hr { background-color: #c8c9ca; border: 0; color: #c8c9ca; height: 2px;
+     margin: 10px 0; padding: 0; }
+
+input, textarea { font: 12px Arial, Verdana, sans-serif; }
+
+small { font-size: 11px; }

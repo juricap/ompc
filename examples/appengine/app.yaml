@@ -1,0 +1,19 @@
+application: ompclib
+version: 1
+runtime: python
+api_version: 1
+
+handlers:
+
+- url: /media
+  static_dir: media
+
+- url: /favicon.ico
+  static_files: media/favicon.ico
+  upload: media/favicon.ico
+
+- url: /m2py
+  script: src/m2py.py
+
+- url: .*
+  script: src/m2py.py
