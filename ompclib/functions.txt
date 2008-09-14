@@ -1,0 +1,1903 @@
+# Downloaded from
+# http://www.mathworks.com/access/helpdesk/help/techdoc/index.html?/access/helpdesk/help/techdoc/demo_example.html&http://www.mathworks.com/access/helpdesk/help/techdoc/matlab_product_page.html
+
+# Ocatve is not 100% compatible too
+# http://wiki.octave.org/wiki.pl?MissingMatlabFunctions
+
+[Startup and Shutdown]
+exit    Terminate MATLAB? program (same as quit)
+finish    Termination M-file for MATLAB? program
+matlabrc    Startup M-file for MATLAB? program
+prefdir    Directory containing preferences, history, and layout files
+preferences    Open Preferences dialog box for MATLAB? and related products
+quit    Terminate the MATLAB? program
+startup    Startup M-file for user-defined options
+userpath    View or change user portion of search path
+
+[Command Window and History]
+clc    Clear Command Window
+commandhistory    Open Command History window, or select it if already open
+commandwindow    Open Command Window, or select it if already open
+diary    Save session to file
+dos    Execute DOS command and return result
+format    Set display format for output
+home    Move cursor to upper-left corner of Command Window
+matlabcolon (matlab:)    Run specified function via hyperlink
+more    Control paged output for Command Window
+perl    Call Perl script using appropriate operating system executable
+system    Execute operating system command and return result
+unix    Execute UNIX? command and return result
+
+[Help for Using MATLAB]
+builddocsearchdb    Build searchable documentation database
+demo    Access product demos via Help browser
+doc    Reference page in Help browser
+docopt    Web browser for UNIX? platforms
+docsearch    Open Help browser Search pane and search for specified term
+echodemo    Run M-file demo step-by-step in Command Window
+help    Help for MATLAB? functions in Command Window
+helpbrowser    Open Help browser to access all online documentation and demos
+helpwin    Provide access to M-file help for all functions
+info    Information about contacting The MathWorks
+lookfor    Search for keyword in all help entries
+playshow    Run M-file demo (deprecated; use echodemo instead)
+support    Open MathWorks Technical Support Web page
+web    Open Web site or file in Web browser or Help browser
+whatsnew    Release Notes for MathWorks^(TM) products
+
+[Workspace]
+assignin    Assign value to variable in specified workspace
+clear    Remove items from workspace, freeing up system memory
+evalin    Execute MATLAB? expression in specified workspace
+exist    Check existence of variable, function, directory, or Java^(TM) programming language class
+openvar    Open workspace variable in Variable Editor or other tool for graphical editing
+pack    Consolidate workspace memory
+uiimport    Open Import Wizard to import data
+which    Locate functions and files
+workspace    Open Workspace browser to manage workspace
+Search Path
+addpath    Add directories to search path
+genpath    Generate path string
+partialpath    Partial pathname description
+path    View or change search path
+path2rc    Save current search path to pathdef.m file
+pathdef    Directories in search path
+pathsep    Path separator for current platform
+pathtool    Open Set Path dialog box to view and change search path
+restoredefaultpath    Restore default search path
+rmpath    Remove directories from search path
+savepath    Save current search path to pathdef.m file
+userpath    View or change user portion of search path
+
+[File Operations]
+cd    Change working directory
+copyfile    Copy file or directory
+delete    Remove files or graphics objects
+dir    Directory listing
+exist    Check existence of variable, function, directory, or Java^(TM) programming language class
+fileattrib    Set or get attributes of file or directory
+filebrowser    Current Directory browser
+isdir    Determine whether input is a directory
+lookfor    Search for keyword in all help entries
+ls    Directory contents on UNIX? platform
+matlabroot    Root directory
+mkdir    Make new directory
+movefile    Move file or directory
+pwd    Identify current directory
+recycle    Set option to move deleted files to recycle folder
+rehash    Refresh function and file system path caches
+rmdir    Remove directory
+toolboxdir    Root directory for specified toolbox
+type    Display contents of file
+what    List MATLAB? files in current directory
+which    Locate functions and files
+
+[Programming Tools]
+clipboard    Copy and paste strings to and from system clipboard
+datatipinfo    Produce short description of input variable
+dbclear    Clear breakpoints
+dbcont    Resume execution
+dbdown    Change local workspace context when in debug mode
+dbquit    Quit debug mode
+dbstack    Function call stack
+dbstatus    List all breakpoints
+dbstep    Execute one or more lines from current breakpoint
+dbstop    Set breakpoints
+dbtype    List M-file with line numbers
+dbup    Change local workspace context
+debug    List M-file debugging functions
+edit    Edit or create M-file
+keyboard    Input from keyboard
+Improve Performance and Tune M-Files
+bench    MATLAB Benchmark
+mlint    Check M-files for possible problems
+mlintrpt    Run mlint for file or directory, reporting results in browser
+pack    Consolidate workspace memory
+profile    Profile execution time for function
+profsave    Save profile report in HTML format
+rehash    Refresh function and file system path caches
+sparse    Create sparse matrix
+zeros    Create array of all zeros
+Source Control
+checkin    Check files into a source control system (UNIX? platforms)
+checkout    Check files out of a source control system (UNIX? platforms)
+cmopts    Name of source control system
+customverctrl    Allow custom source control system (UNIX? platforms)
+undocheckout    Undo previous checkout from source control system (UNIX? platforms)
+verctrl    Source control actions (Windows? platforms)
+Publishing
+grabcode    MATLAB? code from M-files published to HTML
+notebook    Open M-book in Microsoft? Word (MicrosoftWindows? platforms)
+publish    Publish M-file containing cells, saving output to a file of specified type
+
+[System]
+clipboard    Copy and paste strings to and from system clipboard
+computer    Information about computer on which MATLAB? software is running
+dos    Execute DOS command and return result
+getenv    Environment variable
+hostid    MATLAB server host identification number
+maxNumCompThreads    Controls maximum number of computational threads
+perl    Call Perl script using appropriate operating system executable
+setenv    Set environment variable
+system    Execute operating system command and return result
+unix    Execute UNIX? command and return result
+winqueryreg    Item from Microsoft? Windows? registry
+MATLAB Version and License
+ismac    Determine if running MATLAB? for Macintosh? OS X platform
+ispc    Determine if running MATLAB? for PC (Windows?) platform
+isstudent    Determine whether Student Version of MATLAB?
+isunix    Determine if running MATLAB? for UNIX? platform.[1]
+javachk    Generate error message based on Sun^(TM) Java^(TM) feature support
+license    Return license number or perform licensing task
+prefdir    Directory containing preferences, history, and layout files
+usejava    Determine whether Sun^(TM) Java^(TM) feature is supported in MATLAB? software
+ver    Version information for MathWorks^(TM) products
+verLessThan    Compare toolbox version to specified version string
+version    Version number for the MATLAB? software
+
+[Mathematics]
+disp    Display text or array
+display    Display text or array (overloaded method)
+isempty    Determine whether array is empty
+isequal    Test arrays for equality
+isequalwithequalnans    Test arrays for equality, treating NaNs as equal
+isfinite    Array elements that are finite
+isfloat    Determine whether input is floating-point array
+isinf    Array elements that are infinite
+isinteger    Determine whether input is integer array
+islogical    Determine whether input is logical array
+isnan    Array elements that are NaN
+isnumeric    Determine whether input is numeric array
+isscalar    Determine whether input is scalar
+issparse    Determine whether input is sparse
+isvector    Determine whether input is vector
+length    Length of vector
+max    Largest elements in array
+min    Smallest elements in array
+ndims    Number of array dimensions
+numel    Number of elements in array or subscripted array expression
+size    Array dimensions
+
+[Operators]
++    Addition
++    Unary plus
+-    Subtraction
+-    Unary minus
+*    Matrix multiplication
+^    Matrix power
+\    Backslash or left matrix divide
+/    Slash or right matrix divide
+'    Transpose
+.'    Nonconjugated transpose
+.*    Array multiplication (element-wise)
+.^    Array power (element-wise)
+.\    Left array divide (element-wise)
+./    Right array divide (element-wise)
+
+[Elementary Matrices and Arrays]
+
+blkdiag    Construct block diagonal matrix from input arguments
+diag    Diagonal matrices and diagonals of matrix
+eye    Identity matrix
+freqspace    Frequency spacing for frequency response
+ind2sub    Subscripts from linear index
+linspace    Generate linearly spaced vectors
+logspace    Generate logarithmically spaced vectors
+meshgrid    Generate X and Y arrays for 3-D plots
+ndgrid    Generate arrays for N-D functions and interpolation
+ones    Create array of all ones
+rand    Uniformly distributed pseudorandom numbers
+randn    Normally distributed random numbers
+sub2ind    Single index from subscripts
+zeros    Create array of all zeros
+
+[Array Operations]
+accumarray    Construct array with accumulation
+arrayfun    Apply function to each element of array
+bsxfun    Apply element-by-element binary operation to two arrays with singleton expansion enabled
+cast    Cast variable to different data type
+cross    Vector cross product
+cumprod    Cumulative product
+cumsum    Cumulative sum
+dot    Vector dot product
+idivide    Integer division with rounding option
+kron    Kronecker tensor product
+prod    Product of array elements
+sum    Sum of array elements
+tril    Lower triangular part of matrix
+triu    Upper triangular part of matrix
+Array Manipulation
+blkdiag    Construct block diagonal matrix from input arguments
+cat    Concatenate arrays along specified dimension
+circshift    Shift array circularly
+diag    Diagonal matrices and diagonals of matrix
+end    Terminate block of code, or indicate last array index
+flipdim    Flip array along specified dimension
+fliplr    Flip matrix left to right
+flipud    Flip matrix up to down
+horzcat    Concatenate arrays horizontally
+inline    Construct inline object
+ipermute    Inverse permute dimensions of N-D array
+permute    Rearrange dimensions of N-D array
+repmat    Replicate and tile array
+reshape    Reshape array
+rot90    Rotate matrix 90 degrees
+shiftdim    Shift dimensions
+sort    Sort array elements in ascending or descending order
+sortrows    Sort rows in ascending order
+squeeze    Remove singleton dimensions
+vectorize    Vectorize expression
+vertcat    Concatenate arrays vertically
+Specialized Matrices
+compan    Companion matrix
+gallery    Test matrices
+hadamard    Hadamard matrix
+hankel    Hankel matrix
+hilb    Hilbert matrix
+invhilb    Inverse of Hilbert matrix
+magic    Magic square
+pascal    Pascal matrix
+rosser    Classic symmetric eigenvalue test problem
+toeplitz    Toeplitz matrix
+vander    Vandermonde matrix
+wilkinson    Wilkinson's eigenvalue test matrix
+
+[Matrix Analysis]
+cond    Condition number with respect to inversion
+condeig    Condition number with respect to eigenvalues
+det    Matrix determinant
+norm    Vector and matrix norms
+normest    2-norm estimate
+null    Null space
+orth    Range space of matrix
+rank    Rank of matrix
+rcond    Matrix reciprocal condition number estimate
+rref    Reduced row echelon form
+subspace    Angle between two subspaces
+trace    Sum of diagonal elements
+Linear Equations
+chol    Cholesky factorization
+cholinc    Sparse incomplete Cholesky and Cholesky-Infinity factorizations
+cond    Condition number with respect to inversion
+condest    1-norm condition number estimate
+funm    Evaluate general matrix function
+ilu    Sparse incomplete LU factorization
+inv    Matrix inverse
+linsolve    Solve linear system of equations
+lscov    Least-squares solution in presence of known covariance
+lsqnonneg    Solve nonnegative least-squares constraints problem
+lu    LU matrix factorization
+luinc    Sparse incomplete LU factorization
+pinv    Moore-Penrose pseudoinverse of matrix
+qr    Orthogonal-triangular decomposition
+rcond    Matrix reciprocal condition number estimate
+Eigenvalues and Singular Values
+balance    Diagonal scaling to improve eigenvalue accuracy
+cdf2rdf    Convert complex diagonal form to real block diagonal form
+condeig    Condition number with respect to eigenvalues
+eig    Find eigenvalues and eigenvectors
+eigs    Finds largest eigenvalues and eigenvectors of a matrix
+gsvd    Generalized singular value decomposition
+hess    Hessenberg form of matrix
+ordeig    Eigenvalues of quasitriangular matrices
+ordqz    Reorder eigenvalues in QZ factorization
+ordschur    Reorder eigenvalues in Schur factorization
+poly    Polynomial with specified roots
+polyeig    Polynomial eigenvalue problem
+rsf2csf    Convert real Schur form to complex Schur form
+schur    Schur decomposition
+sqrtm    Matrix square root
+ss2tf    Convert state-space filter parameters to transfer function form
+svd    Singular value decomposition
+svds    Find singular values and vectors
+Matrix Logarithms and Exponentials
+expm    Matrix exponential
+logm    Matrix logarithm
+sqrtm    Matrix square root
+
+[Factorization]
+balance    Diagonal scaling to improve eigenvalue accuracy
+cdf2rdf    Convert complex diagonal form to real block diagonal form
+chol    Cholesky factorization
+cholinc    Sparse incomplete Cholesky and Cholesky-Infinity factorizations
+cholupdate    Rank 1 update to Cholesky factorization
+gsvd    Generalized singular value decomposition
+ilu    Sparse incomplete LU factorization
+lu    LU matrix factorization
+luinc    Sparse incomplete LU factorization
+planerot    Givens plane rotation
+qr    Orthogonal-triangular decomposition
+qrdelete    Remove column or row from QR factorization
+qrinsert    Insert column or row into QR factorization
+qrupdate    
+qz    QZ factorization for generalized eigenvalues
+rsf2csf    Convert real Schur form to complex Schur form
+svd    Singular value decomposition
+
+[Trigonometric]
+acos    Inverse cosine; result in radians
+acosd    Inverse cosine; result in degrees
+acosh    Inverse hyperbolic cosine
+acot    Inverse cotangent; result in radians
+acotd    Inverse cotangent; result in degrees
+acoth    Inverse hyperbolic cotangent
+acsc    Inverse cosecant; result in radians
+acscd    Inverse cosecant; result in degrees
+acsch    Inverse hyperbolic cosecant
+asec    Inverse secant; result in radians
+asecd    Inverse secant; result in degrees
+asech    Inverse hyperbolic secant
+asin    Inverse sine; result in radians
+asind    Inverse sine; result in degrees
+asinh    Inverse hyperbolic sine
+atan    Inverse tangent; result in radians
+atan2    Four-quadrant inverse tangent
+atand    Inverse tangent; result in degrees
+atanh    Inverse hyperbolic tangent
+cos    Cosine of argument in radians
+cosd    Cosine ofo argument in degrees
+cosh    Hyperbolic cosine
+cot    Cotangent of argument in radians
+cotd    Cotangent of argument in degrees
+coth    Hyperbolic cotangent
+csc    Cosecant of argument in radians
+cscd    Cosecant of argument in degrees
+csch    Hyperbolic cosecant
+hypot    Square root of sum of squares
+sec    Secant of argument in radians
+secd    Secant of argument in degrees
+sech    Hyperbolic secant
+sin    Sine of argument in radians
+sind    Sine of argument in degrees
+sinh    Hyperbolic sine of argument in radians
+tan    Tangent of argument in radians
+tand    Tangent of argument in degrees
+tanh    Hyperbolic tangent
+
+[Exponential]
+exp    Exponential
+expm1    Compute exp(x)-1 accurately for small values of x
+log    Natural logarithm
+log10    Common (base 10) logarithm
+log1p    Compute log(1+x) accurately for small values of x
+log2    Base 2 logarithm and dissect floating-point numbers into exponent and mantissa
+nextpow2    Next higher power of 2
+nthroot    Real nth root of real numbers
+pow2    Base 2 power and scale floating-point numbers
+reallog    Natural logarithm for nonnegative real arrays
+realpow    Array power for real-only output
+realsqrt    Square root for nonnegative real arrays
+sqrt    Square root
+
+[Complex]
+abs    Absolute value and complex magnitude
+angle    Phase angle
+complex    Construct complex data from real and imaginary components
+conj    Complex conjugate
+cplxpair    Sort complex numbers into complex conjugate pairs
+i    Imaginary unit
+imag    Imaginary part of complex number
+isreal    Determine whether input is real array
+j    Imaginary unit
+real    Real part of complex number
+sign    Signum function
+unwrap    Correct phase angles to produce smoother phase plots
+Rounding and Remainder
+ceil    Round toward infinity
+fix    Round toward zero
+floor    Round toward minus infinity
+idivide    Integer division with rounding option
+mod    Modulus after division
+rem    Remainder after division
+round    Round to nearest integer
+Discrete Math (e.g., Prime Factors)
+factor    Prime factors
+factorial    Factorial function
+gcd    Greatest common divisor
+isprime    Array elements that are prime numbers
+lcm    Least common multiple
+nchoosek    Binomial coefficient or all combinations
+perms    All possible permutations
+primes    Generate list of prime numbers
+rat, rats    Rational fraction approximation
+
+[Polynomials]
+conv    Convolution and polynomial multiplication
+deconv    Deconvolution and polynomial division
+poly    Polynomial with specified roots
+polyder    Polynomial derivative
+polyeig    Polynomial eigenvalue problem
+polyfit    Polynomial curve fitting
+polyint    Integrate polynomial analytically
+polyval    Polynomial evaluation
+polyvalm    Matrix polynomial evaluation
+residue    Convert between partial fraction expansion and polynomial coefficients
+roots    Polynomial roots
+
+[Interpolation]
+dsearch    Search Delaunay triangulation for nearest point
+dsearchn    N-D nearest point search
+griddata    Data gridding
+griddata3    Data gridding and hypersurface fitting for 3-D data
+griddatan    Data gridding and hypersurface fitting (dimension >= 2)
+interp1    1-D data interpolation (table lookup)
+interp1q    Quick 1-D linear interpolation
+interp2    2-D data interpolation (table lookup)
+interp3    3-D data interpolation (table lookup)
+interpft    1-D interpolation using FFT method
+interpn    N-D data interpolation (table lookup)
+meshgrid    Generate X and Y arrays for 3-D plots
+mkpp    Make piecewise polynomial
+ndgrid    Generate arrays for N-D functions and interpolation
+padecoef    Pade' approximation of time delays
+pchip    Piecewise Cubic Hermite Interpolating Polynomial (PCHIP)
+ppval    Evaluate piecewise polynomial
+spline    Cubic spline data interpolation
+tsearchn    N-D closest simplex search
+unmkpp    Piecewise polynomial details
+Delaunay Triangulation and Tessellation
+delaunay    Delaunay triangulation
+delaunay3    3-D Delaunay tessellation
+delaunayn    N-D Delaunay tessellation
+dsearch    Search Delaunay triangulation for nearest point
+dsearchn    N-D nearest point search
+tetramesh    Tetrahedron mesh plot
+trimesh    Triangular mesh plot
+triplot    2-D triangular plot
+trisurf    Triangular surface plot
+tsearch    Search for enclosing Delaunay triangle
+tsearchn    N-D closest simplex search
+Convex Hull
+convhull    Convex hull
+convhulln    N-D convex hull
+patch    Create patch graphics object
+plot    2-D line plot
+trisurf    Triangular surface plot
+Voronoi Diagrams
+dsearch    Search Delaunay triangulation for nearest point
+patch    Create patch graphics object
+plot    2-D line plot
+voronoi    Voronoi diagram
+voronoin    N-D Voronoi diagram
+Domain Generation
+meshgrid    Generate X and Y arrays for 3-D plots
+ndgrid    Generate arrays for N-D functions and interpolation
+
+[Cartesian Coordinate System Conversion]
+cart2pol    Transform Cartesian coordinates to polar or cylindrical
+cart2sph    Transform Cartesian coordinates to spherical
+pol2cart    Transform polar or cylindrical coordinates to Cartesian
+sph2cart    Transform spherical coordinates to Cartesian
+
+[Ordinary Differential Equations (IVP)]
+decic    Compute consistent initial conditions for ode15i
+deval    Evaluate solution of differential equation problem
+ode15i    Solve fully implicit differential equations, variable order method
+ode23, ode45, ode113, ode15s, ode23s, ode23t, ode23tb    Solve initial value problems for ordinary differential equations
+odefile    Define differential equation problem for ordinary differential equation solvers
+odeget    Ordinary differential equation options parameters
+odeset    Create or alter options structure for ordinary differential equation solvers
+odextend    Extend solution of initial value problem for ordinary differential equation
+
+[Delay Differential Equations]
+dde23    Solve delay differential equations (DDEs) with constant delays
+ddeget    Extract properties from delay differential equations options structure
+ddesd    Solve delay differential equations (DDEs) with general delays
+ddeset    Create or alter delay differential equations options structure
+deval    Evaluate solution of differential equation problem
+Boundary Value Problems
+bvp4c    Solve boundary value problems for ordinary differential equations
+bvp5c    Solve boundary value problems for ordinary differential equations
+bvpget    Extract properties from options structure created with bvpset
+bvpinit    Form initial guess for bvp4c
+bvpset    Create or alter options structure of boundary value problem
+bvpxtend    Form guess structure for extending boundary value solutions
+deval    Evaluate solution of differential equation problem
+Partial Differential Equations
+pdepe    Solve initial-boundary value problems for parabolic-elliptic PDEs in 1-D
+pdeval    Evaluate numerical solution of PDE using output of pdepe
+
+[Optimization]
+fminbnd    Find minimum of single-variable function on fixed interval
+fminsearch    Find minimum of unconstrained multivariable function using derivative-free method
+fzero    Find root of continuous function of one variable
+lsqnonneg    Solve nonnegative least-squares constraints problem
+optimget    Optimization options values
+optimset    Create or edit optimization options structure
+Numerical Integration (Quadrature)
+dblquad    Numerically evaluate double integral
+quad    Numerically evaluate integral, adaptive Simpson quadrature
+quadgk    Numerically evaluate integral, adaptive Gauss-Kronrod quadrature
+quadl    Numerically evaluate integral, adaptive Lobatto quadrature
+quadv    Vectorized quadrature
+triplequad    Numerically evaluate triple integral
+
+[Specialized Math]
+airy    Airy functions
+besselh    Bessel function of third kind (Hankel function)
+besseli    Modified Bessel function of first kind
+besselj    Bessel function of first kind
+besselk    Modified Bessel function of second kind
+bessely    Bessel function of second kind
+beta    Beta function
+betainc    Incomplete beta function
+betaln    Logarithm of beta function
+ellipj    Jacobi elliptic functions
+ellipke    Complete elliptic integrals of first and second kind
+erf, erfc, erfcx, erfinv, erfcinv    Error functions
+expint    Exponential integral
+gamma, gammainc, gammaln    Gamma functions
+legendre    Associated Legendre functions
+psi    Psi (polygamma) function
+
+[Elementary Sparse Matrices]
+spdiags    Extract and create sparse band and diagonal matrices
+speye    Sparse identity matrix
+sprand    Sparse uniformly distributed random matrix
+sprandn    Sparse normally distributed random matrix
+sprandsym    Sparse symmetric random matrix
+Full to Sparse Conversion
+find    Find indices and values of nonzero elements
+full    Convert sparse matrix to full matrix
+sparse    Create sparse matrix
+spconvert    Import matrix from sparse matrix external format
+Working with Sparse Matrices
+issparse    Determine whether input is sparse
+nnz    Number of nonzero matrix elements
+nonzeros    Nonzero matrix elements
+nzmax    Amount of storage allocated for nonzero matrix elements
+spalloc    Allocate space for sparse matrix
+spfun    Apply function to nonzero sparse matrix elements
+spones    Replace nonzero sparse matrix elements with ones
+spparms    Set parameters for sparse matrix routines
+spy    Visualize sparsity pattern
+Reordering Algorithms
+amd    Approximate minimum degree permutation
+colamd    Column approximate minimum degree permutation
+colperm    Sparse column permutation based on nonzero count
+dmperm    Dulmage-Mendelsohn decomposition
+ldl    Block LDL' factorization for Hermitian indefinite matrices
+randperm    Random permutation
+symamd    Symmetric approximate minimum degree permutation
+symrcm    Sparse reverse Cuthill-McKee ordering
+
+[Linear Algebra]
+cholinc    Sparse incomplete Cholesky and Cholesky-Infinity factorizations
+condest    1-norm condition number estimate
+eigs    Finds largest eigenvalues and eigenvectors of a matrix
+ilu    Sparse incomplete LU factorization
+luinc    Sparse incomplete LU factorization
+normest    2-norm estimate
+spaugment    Form least squares augmented system
+sprank    Structural rank
+svds    Find singular values and vectors
+Linear Equations (Iterative Methods)
+bicg    Biconjugate gradients method
+bicgstab    Biconjugate gradients stabilized method
+cgs    Conjugate gradients squared method
+gmres    Generalized minimum residual method (with restarts)
+lsqr    LSQR method
+minres    Minimum residual method
+pcg    Preconditioned conjugate gradients method
+qmr    Quasi-minimal residual method
+symmlq    Symmetric LQ method
+Tree Operations
+etree    Elimination tree
+etreeplot    Plot elimination tree
+gplot    Plot nodes and links representing adjacency matrix
+symbfact    Symbolic factorization analysis
+treelayout    Lay out tree or forest
+treeplot    Plot picture of tree
+
+[Math Constants]
+eps    Floating-point relative accuracy
+i    Imaginary unit
+Inf    Infinity
+intmax    Largest value of specified integer type
+intmin    Smallest value of specified integer type
+j    Imaginary unit
+NaN    Not-a-Number
+pi    Ratio of circle's circumference to its diameter, ƒÎ
+realmax    Largest positive floating-point number
+realmin    Smallest positive normalized floating-point number
+
+[Data Analysis Basic Operations]
+brush    Interactively mark, delete, modify, and save observations in graphs
+cumprod    Cumulative product
+cumsum    Cumulative sum
+linkdata    Automatically update graphs when variables change
+prod    Product of array elements
+sort    Sort array elements in ascending or descending order
+sortrows    Sort rows in ascending order
+sum    Sum of array elements
+
+[Descriptive Statistics]
+corrcoef    Correlation coefficients
+cov    Covariance matrix
+max    Largest elements in array
+mean    Average or mean value of array
+median    Median value of array
+min    Smallest elements in array
+mode    Most frequent values in array
+std    Standard deviation
+var    Variance
+
+[Filtering and Convolution]
+conv    Convolution and polynomial multiplication
+conv2    2-D convolution
+convn    N-D convolution
+deconv    Deconvolution and polynomial division
+detrend    Remove linear trends
+filter    1-D digital filter
+filter2    2-D digital filter
+
+[Interpolation and Regression]
+interp1    1-D data interpolation (table lookup)
+interp2    2-D data interpolation (table lookup)
+interp3    3-D data interpolation (table lookup)
+interpn    N-D data interpolation (table lookup)
+mldivide \, mrdivide /    Left or right matrix division
+polyfit    Polynomial curve fitting
+polyval    Polynomial evaluation
+
+[Fourier Transforms]
+abs    Absolute value and complex magnitude
+angle    Phase angle
+cplxpair    Sort complex numbers into complex conjugate pairs
+fft    Discrete Fourier transform
+fft2    2-D discrete Fourier transform
+fftn    N-D discrete Fourier transform
+fftshift    Shift zero-frequency component to center of spectrum
+fftw    Interface to FFTW library run-time algorithm tuning control
+ifft    Inverse discrete Fourier transform
+ifft2    2-D inverse discrete Fourier transform
+ifftn    N-D inverse discrete Fourier transform
+ifftshift    Inverse FFT shift
+nextpow2    Next higher power of 2
+unwrap    Correct phase angles to produce smoother phase plots
+
+[Derivatives and Integrals]
+cumtrapz    Cumulative trapezoidal numerical integration
+del2    Discrete Laplacian
+diff    Differences and approximate derivatives
+gradient    Numerical gradient
+polyder    Polynomial derivative
+polyint    Integrate polynomial analytically
+trapz    Trapezoidal numerical integration
+
+[Time Series Objects]
+General Purpose    Combine timeseries objects, query and set timeseries object properties, plot timeseries objects
+Data Manipulation    Add or delete data, manipulate timeseries objects
+Event Data    Add or delete events, create new timeseries objects based on event data
+Descriptive Statistics    Descriptive statistics for timeseries objects
+General Purpose
+get (timeseries)    Query timeseries object property values
+getdatasamplesize    Size of data sample in timeseries object
+getqualitydesc    Data quality descriptions
+isempty (timeseries)    Determine whether timeseries object is empty
+length (timeseries)    Length of time vector
+plot (timeseries)    Plot time series
+set (timeseries)    Set properties of timeseries object
+size (timeseries)    Size of timeseries object
+timeseries    Create timeseries object
+tsdata.event    Construct event object for timeseries object
+tsprops    Help on timeseries object properties
+tstool    Open Time Series Tools GUI
+
+[Data Manipulation]
+addsample    Add data sample to timeseries object
+ctranspose (timeseries)    Transpose timeseries object
+delsample    Remove sample from timeseries object
+detrend (timeseries)    Subtract mean or best-fit line and all NaNs from time series
+filter (timeseries)    Shape frequency content of time series
+getabstime (timeseries)    Extract date-string time vector into cell array
+getinterpmethod    Interpolation method for timeseries object
+getsampleusingtime (timeseries)    Extract data samples into new timeseries object
+idealfilter (timeseries)    Apply ideal (noncausal) filter to timeseries object
+resample (timeseries)    Select or interpolate timeseries data using new time vector
+setabstime (timeseries)    Set times of timeseries object as date strings
+setinterpmethod    Set default interpolation method for timeseries object
+synchronize    Synchronize and resample two timeseries objects using common time vector
+transpose (timeseries)    Transpose timeseries object
+vertcat (timeseries)    Vertical concatenation of timeseries objects
+Event Data
+addevent    Add event to timeseries object
+delevent    Remove tsdata.event objects from timeseries object
+gettsafteratevent    New timeseries object with samples occurring at or after event
+gettsafterevent    New timeseries object with samples occurring after event
+gettsatevent    New timeseries object with samples occurring at event
+gettsbeforeatevent    New timeseries object with samples occurring before or at event
+gettsbeforeevent    New timeseries object with samples occurring before event
+gettsbetweenevents    New timeseries object with samples occurring between events
+Descriptive Statistics
+iqr (timeseries)    Interquartile range of timeseries data
+max (timeseries)    Maximum value of timeseries data
+mean (timeseries)    Mean value of timeseries data
+median (timeseries)    Median value of timeseries data
+min (timeseries)    Minimum value of timeseries data
+std (timeseries)    Standard deviation of timeseries data
+sum (timeseries)    Sum of timeseries data
+var (timeseries)    Variance of timeseries data
+
+[Time Series Collections General Purpose]
+get (tscollection)    Query tscollection object property values
+isempty (tscollection)    Determine whether tscollection object is empty
+length (tscollection)    Length of time vector
+plot (timeseries)    Plot time series
+set (tscollection)    Set properties of tscollection object
+size (tscollection)    Size of tscollection object
+tscollection    Create tscollection object
+tstool    Open Time Series Tools GUI
+Data Manipulation
+addsampletocollection    Add sample to tscollection object
+addts    Add timeseries object to tscollection object
+delsamplefromcollection    Remove sample from tscollection object
+getabstime (tscollection)    Extract date-string time vector into cell array
+getsampleusingtime (tscollection)    Extract data samples into new tscollection object
+gettimeseriesnames    Cell array of names of timeseries objects in tscollection object
+horzcat (tscollection)    Horizontal concatenation for tscollection objects
+removets    Remove timeseries objects from tscollection object
+resample (tscollection)    Select or interpolate data in tscollection using new time vector
+setabstime (tscollection)    Set times of tscollection object as date strings
+settimeseriesnames    Change name of timeseries object in tscollection
+vertcat (tscollection)    Vertical concatenation for tscollection objects
+
+[Numeric Types]
+arrayfun    Apply function to each element of array
+cast    Cast variable to different data type
+cat    Concatenate arrays along specified dimension
+class    Create object or return class of object
+find    Find indices and values of nonzero elements
+intmax    Largest value of specified integer type
+intmin    Smallest value of specified integer type
+intwarning    Control state of integer warnings
+ipermute    Inverse permute dimensions of N-D array
+isa    Determine whether input is object of given class
+isequal    Test arrays for equality
+isequalwithequalnans    Test arrays for equality, treating NaNs as equal
+isfinite    Array elements that are finite
+isinf    Array elements that are infinite
+isnan    Array elements that are NaN
+isnumeric    Determine whether input is numeric array
+isreal    Determine whether input is real array
+isscalar    Determine whether input is scalar
+isvector    Determine whether input is vector
+permute    Rearrange dimensions of N-D array
+realmax    Largest positive floating-point number
+realmin    Smallest positive normalized floating-point number
+reshape    Reshape array
+squeeze    Remove singleton dimensions
+zeros    Create array of all zeros
+
+[Characters and Strings]
+cellstr    Create cell array of strings from character array
+char    Convert to character array (string)
+eval    Execute string containing MATLAB? expression
+findstr    Find string within another, longer string
+isstr    Determine whether input is character array
+regexp, regexpi    Match regular expression
+sprintf    Write formatted data to string
+sscanf    Read formatted data from string
+strcat    Concatenate strings horizontally
+strcmp, strcmpi    Compare strings
+strings    String handling
+strjust    Justify character array
+strmatch    Find possible matches for string
+strread    Read formatted data from string
+strrep    Find and replace substring
+strtrim    Remove leading and trailing white space from string
+strvcat    Concatenate strings vertically
+
+[Structures]
+arrayfun    Apply function to each element of array
+cell2struct    Convert cell array to structure array
+class    Create object or return class of object
+deal    Distribute inputs to outputs
+fieldnames    Field names of structure, or public fields of object
+getfield    Field of structure array
+isa    Determine whether input is object of given class
+isequal    Test arrays for equality
+isfield    Determine whether input is structure array field
+isscalar    Determine whether input is scalar
+isstruct    Determine whether input is structure array
+isvector    Determine whether input is vector
+orderfields    Order fields of structure array
+rmfield    Remove fields from structure
+setfield    Set value of structure array field
+struct    Create structure array
+struct2cell    Convert structure to cell array
+structfun    Apply function to each field of scalar structure
+
+[Cell Arrays]
+cell    Construct cell array
+cell2mat    Convert cell array of matrices to single matrix
+cell2struct    Convert cell array to structure array
+celldisp    Cell array contents
+cellfun    Apply function to each cell in cell array
+cellplot    Graphically display structure of cell array
+cellstr    Create cell array of strings from character array
+class    Create object or return class of object
+deal    Distribute inputs to outputs
+isa    Determine whether input is object of given class
+iscell    Determine whether input is cell array
+iscellstr    Determine whether input is cell array of strings
+isequal    Test arrays for equality
+isscalar    Determine whether input is scalar
+isvector    Determine whether input is vector
+mat2cell    Divide matrix into cell array of matrices
+num2cell    Convert numeric array to cell array
+struct2cell    Convert structure to cell array
+Function Handles
+class    Create object or return class of object
+feval    Evaluate function
+func2str    Construct function name string from function handle
+function_handle (@)    Handle used in calling functions indirectly
+functions    Information about function handle
+isa    Determine whether input is object of given class
+isequal    Test arrays for equality
+str2func    Construct function handle from function name string
+
+[Java Classes and Objects]
+cell    Construct cell array
+class    Create object or return class of object
+clear    Remove items from workspace, freeing up system memory
+depfun    List dependencies of M-file or P-file
+exist    Check existence of variable, function, directory, or Java^(TM) programming language class
+fieldnames    Field names of structure, or public fields of object
+im2java    Convert image to Java^(TM) image
+import    Add package or class to current import list
+inmem    Names of M-files, MEX-files, Sun^(TM) Java^(TM) classes in memory
+isa    Determine whether input is object of given class
+isjava    Determine whether input is Sun^(TM) Java^(TM) object
+javaaddpath    Add entries to dynamic Sun^(TM) Java^(TM) class path
+javaArray    Construct Sun^(TM) Java^(TM) array
+javachk    Generate error message based on Sun^(TM) Java^(TM) feature support
+javaclasspath    Set and get dynamic Sun^(TM) Java^(TM) class path
+javaMethod    Invoke Sun^(TM) Java^(TM) method
+javaObject    Construct Sun^(TM) Java^(TM) object
+javarmpath    Remove entries from dynamic Sun^(TM) Java^(TM) class path
+methods    Information on class methods
+methodsview    Information on class methods in separate window
+usejava    Determine whether Sun^(TM) Java^(TM) feature is supported in MATLAB? software
+which    Locate functions and files
+
+[Data Type Identification]
+is*    Detect state
+isa    Determine whether input is object of given class
+iscell    Determine whether input is cell array
+iscellstr    Determine whether input is cell array of strings
+ischar    Determine whether item is character array
+isfield    Determine whether input is structure array field
+isfloat    Determine whether input is floating-point array
+isinteger    Determine whether input is integer array
+isjava    Determine whether input is Sun^(TM) Java^(TM) object
+islogical    Determine whether input is logical array
+isnumeric    Determine whether input is numeric array
+isobject    Determine whether input is MATLAB? object
+isreal    Determine whether input is real array
+isstr    Determine whether input is character array
+isstruct    Determine whether input is structure array
+validateattributes    Check validity of array
+who, whos    List variables in workspace
+
+[Data Type Conversion Numeric]
+cast    Cast variable to different data type
+double    Convert to double precision
+int8, int16, int32, int64    Convert to signed integer
+single    Convert to single precision
+typecast    Convert data types without changing underlying data
+uint8, uint16, uint32, uint64    Convert to unsigned integer
+
+[String to Numeric]
+base2dec    Convert base N number string to decimal number
+bin2dec    Convert binary number string to decimal number
+cast    Cast variable to different data type
+hex2dec    Convert hexadecimal number string to decimal number
+hex2num    Convert hexadecimal number string to double-precision number
+str2double    Convert string to double-precision value
+str2num    Convert string to number
+unicode2native    Convert Unicode? characters to numeric bytes
+
+[Numeric to String]
+cast    Cast variable to different data type
+char    Convert to character array (string)
+dec2base    Convert decimal to base N number in string
+dec2bin    Convert decimal to binary number in string
+dec2hex    Convert decimal to hexadecimal number in string
+int2str    Convert integer to string
+mat2str    Convert matrix to string
+native2unicode    Convert numeric bytes to Unicode? characters
+num2str    Convert number to string
+Other Conversions
+cell2mat    Convert cell array of matrices to single matrix
+cell2struct    Convert cell array to structure array
+datestr    Convert date and time to string format
+func2str    Construct function name string from function handle
+logical    Convert numeric values to logical
+mat2cell    Divide matrix into cell array of matrices
+num2cell    Convert numeric array to cell array
+num2hex    Convert singles and doubles to IEEE hexadecimal strings
+str2func    Construct function handle from function name string
+str2mat    Form blank-padded character matrix from strings
+struct2cell    Convert structure to cell array
+
+[Arithmetic Operators]
++    Plus
+-    Minus
+.    Decimal point
+=    Assignment
+*    Matrix multiplication
+/    Matrix right division
+\    Matrix left division
+^    Matrix power
+'    Matrix transpose
+.*    Array multiplication (element-wise)
+./    Array right division (element-wise)
+.\    Array left division (element-wise)
+.^    Array power (element-wise)
+.'    Array transpose
+
+[Relational Operators]
+<    Less than
+<=    Less than or equal to
+>    Greater than
+>=    Greater than or equal to
+==    Equal to
+~=    Not equal to
+
+[Logical Operators]
+&&    Logical AND
+||    Logical OR
+&    Logical AND for arrays
+|    Logical OR for arrays
+~    Logical NOT
+
+[Special Characters]
+:    Create vectors, subscript arrays, specify for-loop iterations
+( )    Pass function arguments, prioritize operators
+[ ]    Construct array, concatenate elements, specify multiple outputs from function
+{ }    Construct cell array, index into cell array
+.    Insert decimal point, define structure field, reference methods of object
+.( )    Reference dynamic field of structure
+..    Reference parent directory
+...    Continue statement to next line
+,    Separate rows of array, separate function input/output arguments, separate commands
+;    Separate columns of array, suppress output from current command
+%    Insert comment line into code
+%{ %}    Insert block of comments into code
+!    Issue command to operating system
+' '    Construct character array
+@    Construct function handle, reference class directory
+
+[String Creation]
+blanks    Create string of blank characters
+cellstr    Create cell array of strings from character array
+char    Convert to character array (string)
+sprintf    Write formatted data to string
+strcat    Concatenate strings horizontally
+strvcat    Concatenate strings vertically
+String Identification
+class    Create object or return class of object
+isa    Determine whether input is object of given class
+iscellstr    Determine whether input is cell array of strings
+ischar    Determine whether item is character array
+isletter    Array elements that are alphabetic letters
+isscalar    Determine whether input is scalar
+isspace    Array elements that are space characters
+isstrprop    Determine whether string is of specified category
+isvector    Determine whether input is vector
+validatestring    Check validity of text string
+
+[String Manipulation]
+deblank    Strip trailing blanks from end of string
+lower    Convert string to lowercase
+strjust    Justify character array
+strrep    Find and replace substring
+strtrim    Remove leading and trailing white space from string
+upper    Convert string to uppercase
+String Parsing
+findstr    Find string within another, longer string
+regexp, regexpi    Match regular expression
+regexprep    Replace string using regular expression
+regexptranslate    Translate string into regular expression
+sscanf    Read formatted data from string
+strfind    Find one string within another
+strread    Read formatted data from string
+strtok    Selected parts of string
+
+[String Evaluation]
+eval    Execute string containing MATLAB? expression
+evalc    Evaluate MATLAB? expression with capture
+evalin    Execute MATLAB? expression in specified workspace
+String Comparison
+strcmp, strcmpi    Compare strings
+strmatch    Find possible matches for string
+strncmp, strncmpi    Compare first n characters of strings
+
+[Bit-wise Functions]
+bitand    Bitwise AND
+bitcmp    Bitwise complement
+bitget    Bit at specified position
+bitmax    Maximum double-precision floating-point integer
+bitor    Bitwise OR
+bitset    Set bit at specified position
+bitshift    Shift bits specified number of places
+bitxor    Bitwise XOR
+swapbytes    Swap byte ordering
+
+[Logical Functions]
+all    Determine whether all array elements are nonzero
+and    Find logical AND of array or scalar inputs
+any    Determine whether any array elements are nonzero
+false    Logical 0 (false)
+find    Find indices and values of nonzero elements
+isa    Determine whether input is object of given class
+iskeyword    Determine whether input is MATLAB? keyword
+isvarname    Determine whether input is valid variable name
+logical    Convert numeric values to logical
+not    Find logical NOT of array or scalar input
+or    Find logical OR of array or scalar inputs
+true    Logical 1 (true)
+xor    Logical exclusive-OR
+
+[Relational Functions]
+eq    Test for equality
+ge    Test for greater than or equal to
+gt    Test for greater than
+le    Test for less than or equal to
+lt    Test for less than
+ne    Test for inequality
+
+[Set Functions]
+intersect    Find set intersection of two vectors
+ismember    Array elements that are members of set
+issorted    Determine whether set elements are in sorted order
+setdiff    Find set difference of two vectors
+setxor    Find set exclusive OR of two vectors
+union    Find set union of two vectors
+unique    Find unique elements of vector
+
+[Date and Time Functions]
+addtodate    Modify date number by field
+calendar    Calendar for specified month
+clock    Current time as date vector
+cputime    Elapsed CPU time
+date    Current date string
+datenum    Convert date and time to serial date number
+datestr    Convert date and time to string format
+datevec    Convert date and time to vector of components
+eomday    Last day of month
+etime    Time elapsed between date vectors
+now    Current date and time
+weekday    Day of week
+
+[M-File Functions and Scripts]
+addOptional (inputParser)    Add optional argument to inputParser schema
+addParamValue (inputParser)    Add parameter-value argument to inputParser schema
+addRequired (inputParser)    Add required argument to inputParser schema
+createCopy (inputParser)    Create copy of inputParser object
+depdir    List dependent directories of M-file or P-file
+depfun    List dependencies of M-file or P-file
+echo    Echo M-files during execution
+end    Terminate block of code, or indicate last array index
+function    Declare M-file function
+input    Request user input
+inputname    Variable name of function input
+inputParser    Construct input parser object
+mfilename    Name of currently running M-file
+namelengthmax    Maximum identifier length
+nargchk    Validate number of input arguments
+nargin, nargout    Number of function arguments
+nargoutchk    Validate number of output arguments
+parse (inputParser)    Parse and validate named inputs
+pcode    Create preparsed pseudocode file (P-file)
+script    Script M-file description
+syntax    Two ways to call MATLAB? functions
+varargin    Variable length input argument list
+varargout    Variable length output argument list
+Evaluation of Expressions and Functions
+ans    Most recent answer
+arrayfun    Apply function to each element of array
+assert    Generate error when condition is violated
+builtin    Execute built-in function from overloaded method
+cellfun    Apply function to each cell in cell array
+echo    Echo M-files during execution
+eval    Execute string containing MATLAB? expression
+evalc    Evaluate MATLAB? expression with capture
+evalin    Execute MATLAB? expression in specified workspace
+feval    Evaluate function
+iskeyword    Determine whether input is MATLAB? keyword
+isvarname    Determine whether input is valid variable name
+pause    Halt execution temporarily
+run    Run script that is not on current path
+script    Script M-file description
+structfun    Apply function to each field of scalar structure
+symvar    Determine symbolic variables in expression
+tic, toc    Measure performance using stopwatch timer
+
+[Timer Functions]
+delete (timer)    Remove timer object from memory
+disp (timer)    Information about timer object
+get (timer)    Timer object properties
+isvalid (timer)    Determine whether timer object is valid
+set (timer)    Configure or display timer object properties
+start    Start timer(s) running
+startat    Start timer(s) running at specified time
+stop    Stop timer(s)
+timer    Construct timer object
+timerfind    Find timer objects
+timerfindall    Find timer objects, including invisible objects
+wait    Wait until timer stops running
+
+[Variables and Functions in Memory]
+ans    Most recent answer
+assignin    Assign value to variable in specified workspace
+datatipinfo    Produce short description of input variable
+genvarname    Construct valid variable name from string
+global    Declare global variables
+inmem    Names of M-files, MEX-files, Sun^(TM) Java^(TM) classes in memory
+isglobal    Determine whether input is global variable
+memory    Display memory information
+mislocked    Determine whether M-file or MEX-file cannot be cleared from memory
+mlock    Prevent clearing M-file or MEX-file from memory
+munlock    Allow clearing M-file or MEX-file from memory
+namelengthmax    Maximum identifier length
+pack    Consolidate workspace memory
+persistent    Define persistent variable
+rehash    Refresh function and file system path caches
+
+[Control Flow]
+break    Terminate execution of for or while loop
+case    Execute block of code if condition is true
+catch    Specify how to respond to error in try statement
+continue    Pass control to next iteration of for or while loop
+else    Execute statements if condition is false
+elseif    Execute statements if additional condition is true
+end    Terminate block of code, or indicate last array index
+error    Display message and abort function
+for    Execute block of code specified number of times
+if    Execute statements if condition is true
+otherwise    Default part of switch statement
+parfor    Parallel for-loop
+return    Return to invoking function
+switch    Switch among several cases, based on expression
+try    Attempt to execute block of code, and catch errors
+while    Repeatedly execute statements while condition is true
+
+[Error Handling]
+addCause (MException)    Append MException objects
+assert    Generate error when condition is violated
+catch    Specify how to respond to error in try statement
+disp (MException)    Display MException object
+eq (MException)    Compare MException objects for equality
+error    Display message and abort function
+ferror    Query the MATLAB? software about errors in file input or output
+getReport (MException)    Get error message for exception
+intwarning    Control state of integer warnings
+isequal (MException)    Compare MException objects for equality
+last (MException)    Last uncaught exception
+lasterr    Last error message
+lasterror    Last error message and related information
+lastwarn    Last warning message
+MException    Construct MException object
+ne (MException)    Compare MException objects for inequality
+rethrow    Reissue error
+rethrow (MException)    Reissue existing exception
+throw (MException)    Terminate function and issue exception
+try    Attempt to execute block of code, and catch errors
+warning    Warning message
+MEX Programming
+dbmex    Enable MEX-file debugging
+inmem    Names of M-files, MEX-files, Sun^(TM) Java^(TM) classes in memory
+mex    Compile MEX-function from C/ C++ or Fortran source code
+mexext    Binary MEX-file name extension
+
+[Classes and Objects]
+addlistener (handle)    Create event listener
+addprop (dynamicprops)    Add dynamic property
+class    Create object or return class of object
+classdef    Class definition key words
+delete (handle)    Handle object destructor function
+dynamicprops    Abstract class used to derive handle class with dynamic properties
+event.EventData    Base class for all data objects passed to event listeners
+event.listener    Class defining listener objects
+event.PropertyEvent    Listener for property events
+event.proplistener    Define listener object for property events
+events     Display class event names
+fieldnames    Field names of structure, or public fields of object
+findobj (handle)    Finds objects matching specified conditions
+findprop (handle)    Find meta.property object associated with property name
+get (hgsetget)    Query property values of handle objects derived from hgsetget class
+getdisp (hgsetget)    Override to change command window display
+handle    Abstract class for deriving handle classes
+hgsetget    Abstract class used to derive handle class with set and get methods
+inferiorto    Specify inferior class relationship
+isa    Determine whether input is object of given class
+isobject    Determine whether input is MATLAB? object
+isvalid (handle)    Is object valid handle object
+loadobj    User-defined class method called by load function
+meta.class    meta.class class describes MATLAB? classes
+meta.class.fromName    Return meta.class object associated with named class
+meta.event    meta.event class describes MATLAB? class events
+meta.method    meta.method class describes MATLAB? class methods
+meta.package    meta.package class describes MATLAB? packages
+meta.package.fromName    Return meta.package object for specified package
+meta.package.getAllPackages    Get all top-level packages
+meta.property    meta.property class describes MATLAB? class properties
+metaclass    Return meta.class object for named class
+methods    Information on class methods
+methodsview    Information on class methods in separate window
+notify (handle)    notify listeners that event is occurring
+properties    Display class property names
+relationaloperators (handle)    Equality and sorting of handle objects
+saveobj    Method called by save function for user-defined objects
+set (hgsetget)    Assign property values to handle objects derived from hgsetget class
+setdisp (hgsetget)    Override to change command window display
+subsasgn    Subscripted assignment for objects
+subsindex    Subscripted indexing for objects
+subsref    Subscripted reference for objects
+substruct    Create structure argument for subsasgn or subsref
+superiorto    Establish superior class relationship
+
+[File Name Construction]
+filemarker    Character to separate file name and internal function name
+fileparts    Parts of file name and path
+filesep    Directory separator for current platform
+fullfile    Build full filename from parts
+tempdir    Name of system's temporary directory
+tempname    Unique name for temporary file
+
+[Opening, Loading, Saving Files]
+daqread    Read Data Acquisition Toolbox (.daq) file
+filehandle    Construct file handle object
+importdata    Load data from disk file
+load    Load workspace variables from disk
+open    Open files based on extension
+save    Save workspace variables to disk
+uiimport    Open Import Wizard to import data
+winopen    Open file in appropriate application (Windows?)
+
+[Memory Mapping]
+disp (memmapfile)    Information about memmapfile object
+get (memmapfile)    Memmapfile object properties
+memmapfile    Construct memmapfile object
+
+[Low-Level File I/O]
+fclose    Close one or more open files
+feof    Test for end-of-file
+ferror    Query the MATLAB? software about errors in file input or output
+fgetl    Read line from file, discarding newline character
+fgets    Read line from file, keeping newline character
+fopen    Open file, or obtain information about open files
+fprintf    Write formatted data to file
+fread    Read binary data from file
+frewind    Move file position indicator to beginning of open file
+fscanf    Read formatted data from file
+fseek    Set file position indicator
+ftell    File position indicator
+fwrite    Write binary data to file
+
+[Text Files]
+csvread    Read comma-separated value file
+csvwrite    Write comma-separated value file
+dlmread    Read ASCII-delimited file of numeric data into matrix
+dlmwrite    Write matrix to ASCII-delimited file
+textread    Read data from text file; write to multiple outputs
+textscan    Read formatted data from text file or string
+
+[XML Documents]
+xmlread    Parse XML document and return Document Object Model node
+xmlwrite    Serialize XML Document Object Model node
+xslt    Transform XML document using XSLT engine
+
+[Microsoft Excel Functions]
+xlsfinfo    Determine whether file contains Microsoft? Excel? (.xls) spreadsheet
+xlsread    Read Microsoft? Excel? spreadsheet file (.xls)
+xlswrite    Write Microsoft? Excel? spreadsheet file (.xls)
+
+[Lotus 1-2-3 Functions]
+wk1finfo    Determine whether file contains 1-2-3 WK1 worksheet
+wk1read    Read Lotus 1-2-3 WK1 spreadsheet file into matrix
+wk1write    Write matrix to Lotus 1-2-3 WK1 spreadsheet file
+
+[Common Data Format (CDF)]
+cdfepoch    Construct cdfepoch object for Common Data Format (CDF) export
+cdfinfo    Information about Common Data Format (CDF) file
+cdfread    Read data from Common Data Format (CDF) file
+cdfwrite    Write data to Common Data Format (CDF) file
+todatenum    Convert CDF epoch object to MATLAB datenum
+
+[Flexible Image Transport System]
+fitsinfo    Information about FITS file
+fitsread    Read data from FITS file
+
+[Hierarchical Data Format (HDF)]
+hdf    Summary of MATLAB HDF4 capabilities
+hdf5    Summary of MATLAB HDF5 capabilities
+hdf5info    Information about HDF5 file
+hdf5read    Read HDF5 file
+hdf5write    Write data to file in HDF5 format
+hdfinfo    Information about HDF4 or HDF-EOS file
+hdfread    Read data from HDF4 or HDF-EOS file
+hdftool    Browse and import data from HDF4 or HDF-EOS files
+
+[Band-Interleaved Data]
+multibandread    Read band-interleaved data from binary file
+multibandwrite    Write band-interleaved data to file
+
+[Audio and Audio/Video General]
+audioplayer    Create audio player object
+audiorecorder    Create audio recorder object
+beep    Produce beep sound
+lin2mu    Convert linear audio signal to mu-law
+mmfileinfo    Information about multimedia file
+mmreader    Create multimedia reader object for reading video files
+mu2lin    Convert mu-law audio signal to linear
+read    Read video frame data from multimedia reader object
+sound    Convert vector into sound
+soundsc    Scale data and play as sound
+
+[SPARCstation-Specific Sound Functions]
+aufinfo    Information about NeXT/SUN (.au) sound file
+auread    Read NeXT/SUN (.au) sound file
+auwrite    Write NeXT/SUN (.au) sound file
+
+[Microsoft WAVE Sound Functions]
+wavfinfo    Information about Microsoft WAVE (.wav) sound file
+wavplay    Play recorded sound on PC-based audio output device
+wavread    Read Microsoft WAVE (.wav) sound file
+wavrecord    Record sound using PC-based audio input device
+wavwrite    Write Microsoft WAVE (.wav) sound file
+Audio/Video Interleaved (AVI) Functions
+addframe    Add frame to Audio/Video Interleaved (AVI) file
+avifile    Create new Audio/Video Interleaved (AVI) file
+aviinfo    Information about Audio/Video Interleaved (AVI) file
+aviread    Read Audio/Video Interleaved (AVI) file
+close (avifile)    Close Audio/Video Interleaved (AVI) file
+movie2avi    Create Audio/Video Interleaved (AVI) movie from MATLAB movie
+
+[Images]
+exifread    Read EXIF information from JPEG and TIFF image files
+im2java    Convert image to Java^(TM) image
+imfinfo    Information about graphics file
+imread    Read image from graphics file
+imwrite    Write image to graphics file
+
+[URL, Zip, Tar, E-Mail]
+gunzip    Uncompress GNU zip files
+gzip    Compress files into GNU zip files
+sendmail    Send e-mail message to address list
+tar    Compress files into tar file
+untar    Extract contents of tar file
+unzip    Extract contents of zip file
+urlread    Read content at URL
+urlwrite    Save contents of URL to file
+zip    Compress files into zip file
+
+[FTP Functions]
+ascii    Set FTP transfer type to ASCII
+binary    Set FTP transfer type to binary
+cd (ftp)    Change current directory on FTP server
+close (ftp)    Close connection to FTP server
+delete (ftp)    Remove file on FTP server
+dir (ftp)    Directory contents on FTP server
+ftp    Connect to FTP server, creating FTP object
+mget    Download file from FTP server
+mkdir (ftp)    Create new directory on FTP server
+mput    Upload file or directory to FTP server
+rename    Rename file on FTP server
+rmdir (ftp)    Remove directory on FTP server
+
+[Basic Plots and Graphs]
+box    Axes border
+errorbar    Plot error bars along curve
+hold     Retain current graph in figure
+LineSpec    Line specification string syntax
+loglog     Log-log scale plot
+plot    2-D line plot
+plot3    3-D line plot
+plotyy    2-D line plots with y-axes on both left and right side
+polar    Polar coordinate plot
+semilogx, semilogy     Semilogarithmic plots
+subplot    Create axes in tiled positions
+
+[Plotting Tools]
+figurepalette    Show or hide figure palette
+pan    Pan view of graph interactively
+plotbrowser    Show or hide figure plot browser
+plotedit    Interactively edit and annotate plots
+plottools    Show or hide plot tools
+propertyeditor    Show or hide property editor
+rotate3d     Rotate 3-D view using mouse
+showplottool    Show or hide figure plot tool
+zoom    Turn zooming on or off or magnify by factor
+
+[Annotating Plots]
+annotation    Create annotation objects
+clabel    Contour plot elevation labels
+datacursormode    Enable or disable interactive data cursor mode
+datetick    Date formatted tick labels
+gtext    Mouse placement of text in 2-D view
+legend     Graph legend for lines and patches
+line    Create line object
+rectangle    Create 2-D rectangle object
+texlabel    Produce TeX format from character string
+title    Add title to current axes
+xlabel, ylabel, zlabel    Label x-, y-, and z-axis
+
+[Area, Bar, and Pie Plots]
+area    Filled area 2-D plot
+bar, barh    Plot bar graph (vertical and horizontal)
+bar3, bar3h    Plot 3-D bar chart
+pareto    Pareto chart
+pie    Pie chart
+pie3    3-D pie chart
+Contour Plots
+contour    Contour plot of matrix
+contour3     3-D contour plot
+contourc    Low-level contour plot computation
+contourf    Filled 2-D contour plot
+ezcontour    Easy-to-use contour plotter
+ezcontourf    Easy-to-use filled contour plotter
+Direction and Velocity Plots
+comet    2-D comet plot
+comet3    3-D comet plot
+compass     Plot arrows emanating from origin
+feather    Plot velocity vectors
+quiver    Quiver or velocity plot
+quiver3    3-D quiver or velocity plot
+Discrete Data Plots
+stairs    Stairstep graph
+stem    Plot discrete sequence data
+stem3    Plot 3-D discrete sequence data
+
+[Function Plots]
+ezcontour    Easy-to-use contour plotter
+ezcontourf    Easy-to-use filled contour plotter
+ezmesh    Easy-to-use 3-D mesh plotter
+ezmeshc    Easy-to-use combination mesh/contour plotter
+ezplot    Easy-to-use function plotter
+ezplot3    Easy-to-use 3-D parametric curve plotter
+ezpolar    Easy-to-use polar coordinate plotter
+ezsurf    Easy-to-use 3-D colored surface plotter
+ezsurfc    Easy-to-use combination surface/contour plotter
+fplot    Plot function between specified limits
+
+[Histograms]
+hist    Histogram plot
+histc    Histogram count
+rose    Angle histogram plot
+
+[Polygons and Surfaces]
+convhull    Convex hull
+cylinder    Generate cylinder
+delaunay    Delaunay triangulation
+delaunay3    3-D Delaunay tessellation
+delaunayn    N-D Delaunay tessellation
+dsearch    Search Delaunay triangulation for nearest point
+dsearchn    N-D nearest point search
+ellipsoid    Generate ellipsoid
+fill    Filled 2-D polygons
+fill3    Filled 3-D polygons
+inpolygon    Points inside polygonal region
+pcolor     Pseudocolor (checkerboard) plot
+polyarea    Area of polygon
+rectint    Rectangle intersection area
+ribbon    Ribbon plot
+slice    Volumetric slice plot
+sphere    Generate sphere
+tsearch    Search for enclosing Delaunay triangle
+tsearchn    N-D closest simplex search
+voronoi    Voronoi diagram
+waterfall    Waterfall plot
+Scatter/Bubble Plots
+plotmatrix    Scatter plot matrix
+scatter    Scatter plot
+scatter3    3-D scatter plot
+
+[Animation]
+frame2im    Convert movie frame to indexed image
+getframe    Capture movie frame
+im2frame    Convert image to movie frame
+movie     Play recorded movie frames
+noanimate    Change EraseMode of all objects to normal
+
+[Bit-Mapped Images]
+frame2im    Convert movie frame to indexed image
+im2frame    Convert image to movie frame
+im2java    Convert image to Java^(TM) image
+image    Display image object
+imagesc    Scale data and display image object
+imfinfo    Information about graphics file
+imformats    Manage image file format registry
+imread    Read image from graphics file
+imwrite    Write image to graphics file
+ind2rgb    Convert indexed image to RGB image
+
+[Printing]
+frameedit    Edit print frames for Simulink? and Stateflow? block diagrams
+hgexport    Export figure
+orient    Hardcopy paper orientation
+print, printopt    Print figure or save to file and configure printer defaults
+printdlg    Print dialog box
+printpreview    Preview figure to print
+saveas    Save figure or Simulink block diagram using specified format
+
+[Finding and Identifying Graphics Objects]
+allchild    Find all children of specified objects
+ancestor    Ancestor of graphics object
+copyobj    Copy graphics objects and their descendants
+delete    Remove files or graphics objects
+findall    Find all graphics objects
+findfigs    Find visible offscreen figures
+findobj    Locate graphics objects with specific properties
+gca    Current axes handle
+gcbf    Handle of figure containing object whose callback is executing
+gcbo    Handle of object whose callback is executing
+gco    Handle of current object
+get    Query object properties
+ishandle    Is valid Handle Graphics? handle
+propedit    Open Property Editor
+set    Set object properties
+Object Creation Functions
+axes    Create axes graphics object
+figure    Create figure graphics object
+hggroup    Create hggroup object
+hgtransform    Create hgtransform graphics object
+image    Display image object
+light    Create light object
+line    Create line object
+patch    Create patch graphics object
+rectangle    Create 2-D rectangle object
+root object    Root object properties
+surface    Create surface object
+text    Create text object in current axes
+uicontextmenu    Create context menu
+
+[Figure Windows]
+clf    Clear current figure window
+close    Remove specified figure
+closereq    Default figure close request function
+drawnow    Flush event queue and update figure window
+gcf    Current figure handle
+hgload    Load Handle Graphics? object hierarchy from file
+hgsave    Save Handle Graphics object hierarchy to file
+newplot    Determine where to draw graphics objects
+opengl    Control OpenGL rendering
+refresh    Redraw current figure
+saveas    Save figure or Simulink block diagram using specified format
+
+[Axes Operations]
+axis    Axis scaling and appearance
+box    Axes border
+cla    Clear current axes
+gca    Current axes handle
+grid    Grid lines for 2-D and 3-D plots
+ishold    Current hold state
+makehgtform    Create 4-by-4 transform matrix
+Operating on Object Properties
+get    Query object properties
+linkaxes    Synchronize limits of specified 2-D axes
+linkprop    Keep same value for corresponding properties
+refreshdata    Refresh data in graph when data source is specified
+set    Set object properties
+
+[Creating Surfaces and Meshes]
+hidden    Remove hidden lines from mesh plot
+mesh, meshc, meshz    Mesh plots
+peaks    Example function of two variables
+surf, surfc    3-D shaded surface plot
+surface    Create surface object
+surfl     Surface plot with colormap-based lighting
+tetramesh    Tetrahedron mesh plot
+trimesh    Triangular mesh plot
+triplot    2-D triangular plot
+trisurf    Triangular surface plot
+
+[Domain Generation]
+griddata    Data gridding
+meshgrid    Generate X and Y arrays for 3-D plots
+
+[Color Operations]
+brighten    Brighten or darken colormap
+caxis    Color axis scaling
+colorbar    Colorbar showing color scale
+colordef    Set default property values to display different color schemes
+colormap    Set and get current colormap
+colormapeditor    Start colormap editor
+ColorSpec    Color specification
+graymon     Set default figure properties for grayscale monitors
+hsv2rgb    Convert HSV colormap to RGB colormap
+rgb2hsv    Convert RGB colormap to HSV colormap
+rgbplot    Plot colormap
+shading    Set color shading properties
+spinmap    Spin colormap
+surfnorm    Compute and display 3-D surface normals
+whitebg    Change axes background color
+
+[Colormaps]
+contrast    Grayscale colormap for contrast enhancement
+
+[Controlling the Camera Viewpoint]
+camdolly    Move camera position and target
+cameratoolbar    Control camera toolbar programmatically
+camlookat    Position camera to view object or group of objects
+camorbit    Rotate camera position around camera target
+campan    Rotate camera target around camera position
+campos    Set or query camera position
+camproj    Set or query projection type
+camroll    Rotate camera about view axis
+camtarget    Set or query location of camera target
+camup    Set or query camera up vector
+camva    Set or query camera view angle
+camzoom    Zoom in and out on scene
+makehgtform    Create 4-by-4 transform matrix
+view    Viewpoint specification
+viewmtx    View transformation matrices
+Setting the Aspect Ratio and Axis Limits
+daspect    Set or query axes data aspect ratio
+pbaspect    Set or query plot box aspect ratio
+xlim, ylim, zlim    Set or query axis limits
+
+[Object Manipulation]
+pan    Pan view of graph interactively
+reset    Reset graphics object properties to their defaults
+rotate    Rotate object in specified direction
+rotate3d     Rotate 3-D view using mouse
+selectmoveresize    Select, move, resize, or copy axes and uicontrol graphics objects
+zoom    Turn zooming on or off or magnify by factor
+
+[Selecting Region of Interest]
+dragrect    Drag rectangles with mouse
+rbbox    Create rubberband box for area selection
+
+[Lighting]
+camlight    Create or move light object in camera coordinates
+diffuse    Calculate diffuse reflectance
+light    Create light object
+lightangle    Create or position light object in spherical coordinates
+lighting    Specify lighting algorithm
+material    Control reflectance properties of surfaces and patches
+specular    Calculate specular reflectance
+
+[Transparency]
+alim    Set or query axes alpha limits
+alpha    Set transparency properties for objects in current axes
+alphamap    Specify figure alphamap (transparency)
+
+[Volume Visualization]
+coneplot    Plot velocity vectors as cones in 3-D vector field
+contourslice    Draw contours in volume slice planes
+curl    Compute curl and angular velocity of vector field
+divergence    Compute divergence of vector field
+flow    Simple function of three variables
+interpstreamspeed    Interpolate stream-line vertices from flow speed
+isocaps    Compute isosurface end-cap geometry
+isocolors    Calculate isosurface and patch colors
+isonormals    Compute normals of isosurface vertices
+isosurface    Extract isosurface data from volume data
+reducepatch    Reduce number of patch faces
+reducevolume    Reduce number of elements in volume data set
+shrinkfaces    Reduce size of patch faces
+slice    Volumetric slice plot
+smooth3    Smooth 3-D data
+stream2    Compute 2-D streamline data
+stream3    Compute 3-D streamline data
+streamline    Plot streamlines from 2-D or 3-D vector data
+streamparticles    Plot stream particles
+streamribbon    3-D stream ribbon plot from vector volume data
+streamslice    Plot streamlines in slice planes
+streamtube    Create 3-D stream tube plot
+subvolume    Extract subset of volume data set
+surf2patch    Convert surface data to patch data
+volumebounds    Coordinate and color limits for volume data
+
+[Predefined Dialog Boxes]
+dialog    Create and display dialog box
+errordlg    Create and open error dialog box
+export2wsdlg    Export variables to workspace
+helpdlg    Create and open help dialog box
+inputdlg    Create and open input dialog box
+listdlg    Create and open list-selection dialog box
+msgbox    Create and open message box
+printdlg    Print dialog box
+printpreview    Preview figure to print
+questdlg    Create and open question dialog box
+uigetdir    Open standard dialog box for selecting a directory
+uigetfile    Open standard dialog box for retrieving files
+uigetpref    Open dialog box for retrieving preferences
+uiopen    Open file selection dialog box with appropriate file filters
+uiputfile    Open standard dialog box for saving files
+uisave    Open standard dialog box for saving workspace variables
+uisetcolor    Open standard dialog box for setting object's ColorSpec
+uisetfont    Open standard dialog box for setting object's font characteristics
+waitbar    Open waitbar
+warndlg    Open warning dialog box
+
+[Deploying User Interfaces]
+guidata    Store or retrieve GUI data
+guihandles    Create structure of handles
+movegui    Move GUI figure to specified location on screen
+openfig    Open new copy or raise existing copy of saved figure
+
+[Developing User Interfaces]
+addpref    Add preference
+getappdata    Value of application-defined data
+getpref    Preference
+ginput    Graphical input from mouse or cursor
+guidata    Store or retrieve GUI data
+guide    Open GUI Layout Editor
+inspect    Open Property Inspector
+isappdata    True if application-defined data exists
+ispref    Test for existence of preference
+rmappdata    Remove application-defined data
+rmpref    Remove preference
+setappdata    Specify application-defined data
+setpref    Set preference
+uigetpref    Open dialog box for retrieving preferences
+uisetpref    Manage preferences used in uigetpref
+waitfor    Wait for condition before resuming execution
+waitforbuttonpress    Wait for key press or mouse-button click
+
+[User Interface Objects]
+menu    Generate menu of choices for user input
+uibuttongroup    Create container object to exclusively manage radio buttons and toggle buttons
+uicontextmenu    Create context menu
+uicontrol    Create user interface control object
+uimenu    Create menus on figure windows
+uipanel    Create panel container object
+uipushtool    Create push button on toolbar
+uitoggletool    Create toggle button on toolbar
+uitoolbar    Create toolbar on figure
+
+[Finding Objects from Callbacks]
+findall    Find all graphics objects
+findfigs    Find visible offscreen figures
+findobj    Locate graphics objects with specific properties
+gcbf    Handle of figure containing object whose callback is executing
+gcbo    Handle of object whose callback is executing
+
+[GUI Utility Functions]
+align    Align user interface controls (uicontrols) and axes
+getpixelposition    Get component position in pixels
+listfonts    List available system fonts
+selectmoveresize    Select, move, resize, or copy axes and uicontrol graphics objects
+setpixelposition    Set component position in pixels
+textwrap    Wrapped string matrix for given uicontrol
+uistack    Reorder visual stacking order of objects
+
+[Controlling Program Execution]
+uiresume, uiwait    Control program execution
+
+[Dynamic Link Libraries]
+calllib    Call function in external library
+libfunctions    Information on functions in external library
+libfunctionsview    Create window displaying information on functions in external library
+libisloaded    Determine whether external library is loaded
+libpointer    Create pointer object for use with external libraries
+libstruct    Construct structure as defined in external library
+loadlibrary    Load external library into MATLAB? software
+unloadlibrary    Unload external library from memory
+
+[Java]
+class    Create object or return class of object
+fieldnames    Field names of structure, or public fields of object
+import    Add package or class to current import list
+inspect    Open Property Inspector
+isa    Determine whether input is object of given class
+isjava    Determine whether input is Sun^(TM) Java^(TM) object
+ismethod    Determine whether input is object method
+isprop    Determine whether input is object property
+javaaddpath    Add entries to dynamic Sun^(TM) Java^(TM) class path
+javaArray    Construct Sun^(TM) Java^(TM) array
+javachk    Generate error message based on Sun^(TM) Java^(TM) feature support
+javaclasspath    Set and get dynamic Sun^(TM) Java^(TM) class path
+javaMethod    Invoke Sun^(TM) Java^(TM) method
+javaObject    Construct Sun^(TM) Java^(TM) object
+javarmpath    Remove entries from dynamic Sun^(TM) Java^(TM) class path
+methods    Information on class methods
+methodsview    Information on class methods in separate window
+usejava    Determine whether Sun^(TM) Java^(TM) feature is supported in MATLAB? software
+
+[Component Object Model and ActiveX]
+actxcontrol    Create Microsoft? ActiveX? control in figure window
+actxcontrollist    List all currently installed Microsoft? ActiveX? controls
+actxcontrolselect    Open GUI to create Microsoft? ActiveX? control
+actxGetRunningServer    Get handle to running instance of Automation server
+actxserver    Create COM server
+addproperty    Add custom property to COM object
+class    Create object or return class of object
+delete (COM)    Remove COM control or server
+deleteproperty    Remove custom property from COM object
+enableservice    Enable, disable, or report status of Automation server
+eventlisteners    List all event handler functions registered for COM object
+events (COM)    List of events COM object can trigger
+Execute    Execute MATLAB? command in server
+Feval (COM)    Evaluate MATLAB? function in server
+fieldnames    Field names of structure, or public fields of object
+get (COM)    Get property value from interface, or display properties
+GetCharArray    Get character array from server
+GetFullMatrix    Get matrix from server
+GetVariable    Get data from variable in server workspace
+GetWorkspaceData    Get data from server workspace
+inspect    Open Property Inspector
+interfaces    List custom interfaces to COM server
+invoke    Invoke method on object or interface, or display methods
+isa    Determine whether input is object of given class
+iscom    Is input COM object
+isevent    True if COM object event
+isinterface    Is input COM interface
+ismethod    Determine whether input is object method
+isprop    Determine whether input is object property
+load (COM)    Initialize control object from file
+MaximizeCommandWindow    Open server window on Microsoft? Windows? desktop
+methods    Information on class methods
+methodsview    Information on class methods in separate window
+MinimizeCommandWindow    Minimize size of server window
+move    Move or resize control in parent window
+propedit (COM)     Open built-in property page for control
+PutCharArray    Store character array in server
+PutFullMatrix    Store matrix in server
+PutWorkspaceData    Store data in server workspace
+Quit (COM)    Terminate MATLAB? server
+registerevent    Register event handler for COM object event at run-time
+release    Release interface
+save (COM)    Serialize control object to file
+set (COM)    Set object or interface property to specified value
+unregisterallevents    Unregister all event handlers for COM object event at run-time
+unregisterevent    Unregister event handler for COM object event at run-time
+
+[Web Services]
+callSoapService    Send SOAP message off to endpoint
+createClassFromWsdl    Create MATLAB? object based on WSDL file
+createSoapMessage    Create SOAP message to send to server
+parseSoapResponse    Convert response string from SOAP server into MATLAB? types
+
+[Serial Port Devices]
+clear (serial)    Remove serial port object from MATLAB workspace
+delete (serial)    Remove serial port object from memory
+disp (serial)    Serial port object summary information
+fclose (serial)    Disconnect serial port object from device
+fgetl (serial)    Read line of text from device and discard terminator
+fgets (serial)    Read line of text from device and include terminator
+fopen (serial)    Connect serial port object to device
+fprintf (serial)    Write text to device
+fread (serial)    Read binary data from device
+fscanf (serial)    Read data from device, and format as text
+fwrite (serial)    Write binary data to device
+get (serial)    Serial port object properties
+instrcallback    Event information when event occurs
+instrfind    Read serial port objects from memory to MATLAB workspace
+instrfindall    Find visible and hidden serial port objects
+isvalid (serial)    Determine whether serial port objects are valid
+length (serial)    Length of serial port object array
+load (serial)    Load serial port objects and variables into MATLAB workspace
+readasync    Read data asynchronously from device
+record    Record data and event information to file
+save (serial)    Save serial port objects and variables to MAT-file
+serial    Create serial port object
+serialbreak    Send break to device connected to serial port
+set (serial)    Configure or display serial port object properties
+size (serial)    Size of serial port object array
+stopasync    Stop asynchronous read and write operations
+

@@ -1,0 +1,95 @@
+=One MATLAB(R) Per Child=
+
+_An open-source MATLAB(R) to Python compiler_
+
+Author: `Peter Jurica <juricap@gmail.com>`
+
+==Introduction==
+
+OMPC (http://ompc.juricap.com) aims to allow effortless reuse of MATLAB code 
+from Python. OMPC is a code adaptation layer that translates MATLAB's m-files
+into Python compatible syntax. The generated Python compatible code 
+depends on OMPClib which provides MALTAB compatible array interface for Python.
+The OMPClib interface is another numerical Python library but the only one with 
+indexing based at 1 instead at 0, strict FORTRAN binary interface and 
+copy on assignment.
+
+  
+==Download and Installation==
+
+Download the OMPC source code through:
+
+  http://ompc.juricap.com/
+  
+  or directly
+  
+  hg clone http://bitbucket.org/juricap/ompc/
+
+View the source code at:
+
+  http://bitbucket.org/juricap/ompc/
+
+==Documentation==
+
+View the last release API documentation at:
+
+  http://ompc.juricap.com/
+
+==Using==
+
+To use OMPC simply import it in your Python session.
+
+  import ompc
+
+Importing OMPC installs an import hook that will enable importing of 
+MATLAB compatible files into to current Python session. This means 
+that for example a file 'add.m' can be imported using the following statement:
+
+  import add
+
+The import hooks, upon finding the m-file named 'add.m', call the OMPC compiler
+that adapts the code for use with the OMPClib and calls the Python compiler 
+to create the resulting 'add.pyc' file. This exactly replicates the result 
+produced by importing a python module.
+
+For further information on this process or detailed explanation of 
+the OMPClib emulation layer visit:
+
+    http://ompc.juricap.com/
+
+
+==License==
+
+{{{
+
+  Copyright (c) 2008, Peter Jurica, RIKEN Brain Science Institute
+  All rights reserved.
+  
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are met:
+      * Redistributions of source code must retain the above copyright
+        notice, this list of conditions and the following disclaimer.
+      * Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+      * Neither the name of the RIKEN Brain Science Institute nor the
+        names of its contributors may be used to endorse or promote products
+        derived from this software without specific prior written permission.
+      * All advertising materials mentioning features or use of this software
+        must display the following acknowledgement:
+        This product includes software developed by Peter Jurica.
+
+  
+  THIS SOFTWARE IS PROVIDED BY Peter Jurica ''AS IS'' AND ANY
+  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+  DISCLAIMED. IN NO EVENT SHALL Peter Jurica nor RIKEN Brain Science Institute 
+  BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, 
+  OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; 
+  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
+  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
+  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN 
+  IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+}}}
