@@ -9,7 +9,7 @@ Author: `Peter Jurica <juricap@gmail.com>`
 OMPC (http://ompc.juricap.com) aims to allow effortless reuse of MATLAB code 
 from Python. OMPC is a code adaptation layer that translates MATLAB's m-files
 into Python compatible syntax. The generated Python compatible code 
-depends on OMPClib which provides MALTAB compatible array interface for Python.
+depends on OMPClib which provides MATLAB compatible array interface for Python.
 The OMPClib interface is another numerical Python library but the only one with 
 indexing based at 1 instead at 0, strict FORTRAN binary interface and 
 copy on assignment.

@@ -1,0 +1,36 @@
+
+ompc> if a == 1, d, end, end
+if a == 1:
+    d
+end
+__error__
+
+ompc> a= 1, b=7
+a = 1; print a
+b = 7; print b
+
+ompc> a= 1; b=7
+a = 1
+b = 7; print b
+
+ompc> a(12).momo = @(x) 1, b=7
+a(12).momo = lambda x: 1; print a
+b = 7; print b
+
+# keywords
+ompc> switch 1, case 7, a end
+__switch_0__ = 1
+if 0:
+    pass
+elif __switch_0__ == 7:
+    a
+end
+
+ompc> 12
+print 12
+
+ompc> disp a b c d
+disp("a", "b", "c", "d")
+
+ompc> save a b c d
+disp(a, b, c, d)
