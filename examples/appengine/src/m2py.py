@@ -33,10 +33,10 @@ class M2PyHandler(webapp.RequestHandler, DjangoHandler):
         user = users.get_current_user()
         d = {'status':self.get_status(user), 'message': ''}
         content = f or t or None
-        if len(content) > 5000:
-            d['message'] = """<p>Your submission was truncated to 5,000 characters.
+        if len(content) > 10000:
+            d['message'] = """<p>Your submission was truncated to 10,000 characters.
             If your intentions are not bad and there is a possibility that 
-            the error you are aubmitting is beyond the 5,000 characters 
+            the error you are aubmitting is beyond the 10,000 characters 
             please copy/paste the problematic section directly into 
             the textarea below.</p>"""
             mail.send_mail(sender="juricap@gmail.com",
@@ -51,7 +51,7 @@ class M2PyHandler(webapp.RequestHandler, DjangoHandler):
             from StringIO import StringIO
             fout = StringIO()
             #logging.info(repr(f))
-            log = CompileLog(owner=user, content=content[:5000])
+            log = CompileLog(owner=user, content=content[:10000])
             try:
                 m2py(content, fout)
                 log.ompc_converted = True

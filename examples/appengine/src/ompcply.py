@@ -277,9 +277,9 @@ def _print_error(*args, **kwargs):
         _errors.append(' '.join(args))
     else:
         d = {'sep':sep, 'file':of}
-        _print3000()
+        _print3000(**d)
         _print3000(*args, **d)
-        _print3000("On line: %d!"%(_lineno+1))
+        _print3000("On line: %d!"%(_lineno+1), **d)
 
         
 def _pop_from_key_stack():
