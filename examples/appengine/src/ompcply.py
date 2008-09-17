@@ -1,5 +1,7 @@
 # This file is a part of OMPC (http://ompc.juricap.com/)
 
+import sys
+sys.path += ['../outside/ply']
 OCTAVE = False
 
 # TODO
@@ -206,9 +208,6 @@ def t_error(t):
     t.lexer.skip(1)
     
 # Build the lexer
-import sys
-# FIXME
-sys.path += ['../outside']
 import lex
 lex.lex()
 
@@ -266,7 +265,10 @@ def _print(src):
 
 _errors = []
 def _print_error(*args, **kwargs):
-    global _errors
+    """Error output.
+    This function should be used for output of all errors.
+    """
+    global _errors, _lineno
     from sys import stderr
     sep = kwargs.get('sep',' ')
     of = kwargs.get('file', stderr)
@@ -275,42 +277,19 @@ def _print_error(*args, **kwargs):
         _errors.append(' '.join(args))
     else:
         d = {'sep':sep, 'file':of}
+        _print3000()
         _print3000(*args, **d)
+        _print3000("On line: %d!"%(_lineno+1))
 
-def sign(x):
-    if x >= 0: return 1
-    return -1
-
-class mvar:
-    pass
-
-class marray(mvar):
-    def __call__(self,*args):
-        print '--- Calling me with args:', args
-
-class _mslice:
-    def __getitem__(self,args):
-        if type(args) is slice:
-            s = sign(args.step)
-            args = slice(args.start,args.step-s,args.stop)
-        return marray(r_[args])
-
-mslice = _mslice()
-mcat = marray
-
-class mcellarray(list):
-    def __init__(self,l):
-        list.__init__(self, l)
-    def __setitem__(self,i,v):
-        if i >= len(self):
-            self.extend([None]*(i-len(self)) + [v])
-
-__ompc_whos__ = { 'mcat': mcat, 'mslice': mslice, 'marray': marray }
-
-# def p_statement_list(p):
-#     '''statement_final : statement_list NEWLINE'''
-#     p[0] = p[1]
-
+        
+def _pop_from_key_stack():
+    global _key_stack
+    if len(_key_stack) < 1:
+        _print_error('An "end" without matching keyword!')
+        _reset()
+        return None
+    return _key_stack.pop()
+        
 def p_statement_list(p):
     '''statement_list : statement
                       | statement COMMA
@@ -333,10 +312,11 @@ def _print_statement(x, send, p0):
         pass
     elif xs[0] == '@':
         assert len(_key_stack) == 1 and _key_stack[0] == 'function'
-        _key_stack.pop()
+        _pop_from_key_stack()
         _tabs = TABSHIFT
         dedent = True
-    elif xs in _keywords or xs in _special or \
+    #xs in _special or \
+    elif xs in _keywords or \
          xs[:2] == '__' or xs in ['elif', 'else:']:
         if xs not in ['end', 'break', 'continue', 'return']:
             dedent = True
@@ -345,8 +325,6 @@ def _print_statement(x, send, p0):
         if _lvalues:
             for lv in _lvalues:
                 res += '; print %s'%lv
-        #else:
-        #    res = 'ans = %s; print ans'%res
     _lvalues = []
     if dedent: _tabs -=  TABSHIFT
     _print(finish+res)
@@ -357,16 +335,11 @@ def p_statement_list2(p):
     '''statement_list : statement_list statement
                       | statement_list COMMA statement
                       | statement_list SEMICOLON statement'''
-    #print 'quaaaaaaaaaaaaaa', map(str, p)
     p[0] = _print_statement('\n'+p[-1], len(p)>3 and p[2] or None, p[0])
 
 def p_statement_expr(p):
     '''statement : expression'''
-    global __ompc_whos__
-    #print '----------- expr -> statement', map(str, p)
     p[0] = p[1]
-#     #if __debug__:
-#     #    exec(p[0], __ompc_whos__, locals())
 
 def p_statement_function(p):
     '''statement : FUNCTION LBRACKET name_list RBRACKET "=" NAME LPAREN name_list RPAREN
@@ -375,7 +348,7 @@ def p_statement_function(p):
                  | FUNCTION NAME "=" NAME
                  | FUNCTION NAME LPAREN name_list RPAREN
                  | FUNCTION NAME'''
-    global _tabs, _key_stack
+    global _tabs, _key_stack, _func_name
     argout, fname, argin = None, None, None
     if '=' in p:
         if p[2] == '[':
@@ -388,8 +361,8 @@ def p_statement_function(p):
         fname = p[2]
         if '(' in p: argin = p[4]
     p[0] = '@mfunction("%s")\ndef %s(%s):'%(argout, fname, argin)
+    _func_name = fname
     _key_stack.append('function')
-    #_print(p[0])
     _tabs += TABSHIFT
 
 def p_expression_lambda_handle(p):
@@ -507,31 +480,23 @@ def p_statement_global(p):
     p[0] = 'global %s'%p[2]
     #_print(p[0])
 
+_func_name = None
 def p_statement_persistent(p):
     """statement : PERSISTENT list_spaces"""
+    global _func_name
     # FIXME, store in in a module or thread ???
-    p[0] = 'global __persistent__'
-    #p[0] += 'for _x in "%s".split(','): locals'%p[2]
-
-#def command
+    if _func_name is None:
+        _print_error('"persistent" outside of a function block!')
+    p[0] = 'global __persistent__\n'
+    p[0] = "__persistent__['%s'] = '%s'"%(_func_name, p[2])
 
 def p_expression_list_space(p):
     '''list_spaces : list_spaces NAME'''
-    # print 'kooooooooooooooool2', map(str, p)
     p[0] = '%s, %s'%(p[1], p[2])
 
 def p_expression_list_space_2(p):
     '''list_spaces : NAME'''
-    # print 'kooooooooooooooool1', map(str, p)
     p[0] = p[1]
-
-def p_statement_list_spaces(p):
-    '''statement2 : list_spaces NEWLINE
-                  | list_spaces COMMA
-                  | list_spaces SEMICOLON'''
-    # print 'kooooooooooooooool3', map(str, p)
-    p[0] = p[1]
-    _print('%s()'%p[0])
 
 def p_statement_try(p):
     '''statement : TRY'''
@@ -539,28 +504,21 @@ def p_statement_try(p):
     p[0] = 'try:'
     _key_stack.append('try')
     _tabs += TABSHIFT
-    #_print(p[0])
 
 def p_statement_catch(p):
     '''statement : CATCH'''
-    # FIXME if p is cellarray we should copare with in
     global _tabs, _key_stack
     p[0] = 'except:'%(_switch_stack[-1], p[2])
     assert _key_stack[-1] == 'try'
-    _tabs -= TABSHIFT
-    #_print(p[0])
-    _tabs += TABSHIFT
-
 
 def p_statement_end(p):
     'statement : END'
     global _tabs, _key_stack, _switch_stack
     _tabs -= TABSHIFT
     p[0] = 'end'
-    kw = _key_stack.pop()
+    kw = _pop_from_key_stack()
     if kw == 'switch':
         _switch_stack.pop()
-    #_print(p[0])
 
 def _getname(lname):
     pos = lname.find('(')
@@ -570,18 +528,12 @@ def _getname(lname):
         return lname
     return lname[:pos]
 
-# def _getname(lname):
-#     return lname[:lname.find('(')]
-
 def p_statement_assign(p):
     '''statement : name_sub "=" expression
                  | name_attr "=" expression
                  | exprmcat "=" expression
                  | NAME "=" expression'''
-    global __ompc_whos__, _lvalues
-    #print '----------- assign -> statement', map(str, p)
-    #if not names.has_key(p[1]):
-    #    eval('%s = marray(%s)'%p[3])
+    global _lvalues
     lname = p[1]
     if lname[0] == '[':
         # [...]
@@ -598,25 +550,14 @@ def p_statement_assign(p):
     else:
         names[lname] = '%s'%p[3]
         _lvalues = [lname]
-    #print '------------- set lvalues to', _lvalues
     p[0] = '%s = %s'%(p[1], p[3])
-    #_print(p[0])
-    if __debug__:
-        __ompc_whos__[lname] = p[3] #eval(p[3])
-        #print __ompc_whos__
-        #exec(p[0], __ompc_whos__, locals())
 
-# def p_statement_with_comment(p):
-#     '''statement : statement comment_text'''
-#     p[0] = '%s    %s'%(p[1], p[2])
 
 def p_statement_nogroup(p):
     """statement : NAME NAME
                  | NAME NUMBER"""
     # treating cases like "hold on, axis square"
-    #print '---------jojo'
     p[0] = '%s("%s")'%(p[1], p[2])
-    #_print(p[0])
 
 def p_expr_list(p):
     '''exprlist : exprlist COMMA expression'''
@@ -631,7 +572,6 @@ def p_expr_inlist(p):
                   | exprinlist SEMICOLON expression
                   | exprinlist NEWLINE expression'''
     if p[2] in ['SEMICOLON', 'NEWLINE']:
-    #if p[2] in ';\n':
         p[0] = '%s, OMPCSEMI, %s'%(p[1], p[3])
     else:
         p[0] = '%s, %s'%(p[1], p[3])
@@ -643,7 +583,6 @@ def p_expr_inlist2(p):
 def p_statement_empty(p):
     '''statement : empty'''
     p[0] = ''
-    #_print('')
 
 def p_expression_inlist_empty(p):
     "exprinlist : empty"
@@ -707,6 +646,10 @@ def p_expression_uminus(p):
     "expression : '-' expression %prec UMINUS"
     p[0] = '-%s'%p[2]
 
+def p_expression_option(p):
+    "cmd_option : '-' NAME"
+    p[0] = '-%s'%p[2]
+
 def p_expression_uplus(p):
     "expression : '+' expression %prec UPLUS"
     p[0] = p[2]
@@ -758,7 +701,6 @@ def p_expr_flatslice(p):
 
 def _check_name(name):
     from keyword import iskeyword
-    #print name
     if name == 'class':
         name = 'mclass'
     elif iskeyword(name) or isompcreserved(name):
@@ -777,7 +719,8 @@ def p_expression_sub(p):
     p[0] = '%s(%s)'%(p[1], p[3])
 
 def p_name_attr2(p):
-    "name_attr : name_attr '.' NAME"
+    """name_attr : name_sub '.' NAME
+                 | name_attr '.' NAME"""
     p[0] = '%s.%s'%(p[1], p[3])
 
 def p_name_attr(p):
@@ -814,26 +757,16 @@ def p_expression_number(p):
 
 def p_expression_name(p):
     "expression : NAME"
-#     try:
-#         p[0] = names[p[1]]
-#     except LookupError:
-#         print "Undefined name '%s'" % p[1]
-#         p[0] = 0
-
-# comments are done in preprocessing
-# def p_comment(p):
-#     "comment_text : COMMENT"
-#     p[0] = '# %s'%p[1]
-#     _print(p[0])
 
 _more = False
 _lineno = 0
 def p_error(p):
-    global _comment, _more, _pinlist, _lineno
+    global _comment, _more, _pinlist, _lineno, _last_line
     if p:
         if p.value == 'NEWLINE' and _pinlist:
             _more = True
         else:
+            _print_error(_last_line)
             _print_error("Syntax error at line %d '%s'!" %(_lineno, p.value))
             pass
     else:
@@ -845,43 +778,39 @@ def p_error(p):
 import yacc
 yacc.yacc(debug=1)
 
-def mysub(x):
-    f, t = x.span()
-    return 'x'*(t-f)
-
-import sys
 def translate(data, outfile=sys.stdout):
-    global _lineno
+    """Entry point to the OMPC translator.
+    This function functions as a preprocessor. There are aspect of M-language
+    that are difficult (cause conflicts) to be solved by a parser. It is also 
+    much faster to implement some of the syntax by very simple checks.
+    The preprocessor
+     - combines continuations '...' (single line is submitted to the compiler)
+     - removes comments, but makes it possible to add them later
+     -
+    """
+    global _lineno, _last_line
     from re import sub, finditer
     com = ''
     d = []
     _lineno = 1
     for x in data.split('\n'):
-        # skip empty statements
-        x = x.replace('\r', '')
-        if not x.strip():
-            _print3000(file=outfile)
-            _lineno += 1
+        # preprocess, the returned values are strip of whitespace, and 
+        # the optional coment is returned
+        s, com = _ompc_preprocess(x)
+        # if s is None a continuation was requested, submit the next line
+        if s is None:
             continue
-        # remove comments
-        x2 = sub(r"'((?:''|[^\n'])*)'", mysub, x)
-        pos = list(finditer(r'\s*%.*', x2))
-        if pos:
-            pos = pos[0].start()
-            com = x[pos:].replace('%', '#', 1)
-            x = x[:pos]
-            if not x.strip(): com = com.lstrip()
-        if x.strip().endswith('...'):
-            d += [ x ]
-            _lineno += 1
-            continue
-        else:
-            d = [ x ]
-        yacc.myparse(''.join(d) + '\n', outfile)
         
-        _print3000(_gettabs()[:-4] + com, file=outfile)
+        _last_line = s
+        yacc.myparse(s + '\n', outfile)
+        
+        # FIXME do something about the comments
+        if s.strip():
+            _print3000(_gettabs()[:-4] + com.strip(), file=outfile)
+        else:
+            _print3000(com, file=outfile)
         com = ''
-        d = []
+        _lineno += 1
 
 def translate_to_str(data):
     from StringIO import StringIO
@@ -893,7 +822,6 @@ _xbuf = ''
 def _myparse(x, outfile=sys.stdout):
     global _more, _xbuf, _outfile
     _outfile = outfile
-    #print '>>>', _xbuf + x
     ret = yacc.parse(_xbuf + x)
     if _more:
         # this takes care of the newline inside of [] and {}. We don't want 
@@ -908,6 +836,65 @@ def _myparse(x, outfile=sys.stdout):
     return ret
 
 yacc.myparse = _myparse
+
+# when searching for comments we make thigs easier by replacing contetns
+# of all strings with something else than "%"
+def _mysub(x):
+    "Helper for replacement of strings."
+    f, t = x.span()
+    return 'x'*(t-f)
+
+_cont = []
+def _ompc_preprocess(x):
+    """OMPC preprocessor.
+    Takes a single line of m-code and returns a tuple of
+    stripped m-code and a comment.
+    Continuation is requested by the 1st returned value set to None.
+    """
+    global _cont
+    from re import sub, findall, finditer
+    # skip empty statements and take care of possible funny endlines 
+    # only '\n' is allowed into the parser
+    x = x.replace('\r', '')
+    if not x.strip():
+        return '', ''
+    
+    # remove comments
+    x2 = sub(r"'((?:''|[^\n'])*)'", _mysub, x)
+    pos = list(finditer(r'\s*%.*', x2))
+    com = ''
+    if pos:
+        pos = pos[0].start()
+        com = x[pos:].replace('%', '#', 1)
+        x = x[:pos]
+        if not x.strip():
+            com = com.lstrip()
+    
+    # combine continuations
+    _cont += [ x ]
+    if x.strip().endswith('...'):
+        _cont[-1] = x.strip()[:-3]
+        return None, com
+    
+    # take care of lines like the following
+    # "save a b c d -v7.3"
+    # "hold"
+    # these can be detected, they can not have '{}[]()=', they are simply
+    # NAMEs and NUMBERs behind a name
+    
+    # FIXME should I make another parser just for this?
+    LOC = ''.join(_cont)
+    toks = LOC.split()
+    if len(findall(r'[(){}\[\]=]', LOC)) == 0 and \
+                toks and toks[0] not in _keywords:
+        from re import split
+        names = [ x for x in split('[;,\s]*', LOC.strip()) if x ]
+        # names = LOC.split()
+        LOC = '%s(%s)'%( names[0], ', '.join([ "'%s'"%x for x in names[1:] ]) )
+    
+    _cont = []
+    return LOC, com
+
 
 usage = """\
 ompcply.py            - to get ompc compiler test console
@@ -942,7 +929,18 @@ if __name__ == "__main__":
             s = raw_input('ompc> ') + '\n'
         except EOFError:
             break
-        if not s: continue
+        
+        # preprocess, the returned values are strip of whitespace, and 
+        # the optional coment is returned
+        s, com = _ompc_preprocess(s)
+        # if s is None a continuation was requested, submit the next line
+        if s is None:
+            continue
+        
+        # if s is empty don't do anything
+        if not s:
+            continue
+        
         if LEXDEBUG:
             # Tokenize
             lex.input(s)
@@ -952,6 +950,6 @@ if __name__ == "__main__":
                 print tok
                 print _errors
                 _errors = []
-        if s.strip():
-            yacc.myparse(s)
-            print
+        
+        yacc.myparse(s)
+        print

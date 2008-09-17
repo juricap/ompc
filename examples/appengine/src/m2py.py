@@ -16,33 +16,10 @@ def mysub(x):
     return 'x'*(t-f)
 
 def m2py(data, outfile):
-    com = ''
-    d = []
+    from src.ompcply import translate
     _reset()
-    for x in data.split('\n'):
-        # skip empty statements
-        x = x.replace('\r', '')
-        if not x.strip():
-            _print3000(file=outfile)
-            continue
-        # remove comments
-        x2 = re.sub(r"'((?:''|[^\n'])*)'", mysub, x)
-        pos = list(re.finditer(r'\s*%.*', x2))
-        if pos:
-            pos = pos[0].start()
-            com = x[pos:].replace('%', '#', 1)
-            x = x[:pos]
-            if not x.strip(): com = com.lstrip()
-        if x.strip().endswith('...'):
-            d += [ x ]
-            continue
-        else:
-            d = [ x ]
-        yacc.myparse(''.join(d) + '\n', outfile)
-        _print3000(_gettabs()[:-4] + com, file=outfile)
-        com = ''
-        d = []
-
+    translate(data, outfile)
+        
 class M2PyHandler(webapp.RequestHandler, DjangoHandler):
     def get(self):
         user = users.get_current_user()
@@ -62,10 +39,11 @@ class M2PyHandler(webapp.RequestHandler, DjangoHandler):
             the error you are aubmitting is beyond the 5,000 characters 
             please copy/paste the problematic section directly into 
             the textarea below.</p>"""
-            mail.send_mail(sender="ompclib@juricap.com",
-              to="juricap@gmail.com",
+            mail.send_mail(sender="juricap@gmail.com",
+              to="juricap@juricap.com",
               subject="ompc misuse",
               body="somebody (%s) tried to upload %d bytes."%(user, len(content)))
+            logging.error("somebody (%s) tried to upload %d bytes."%(user, len(content)))
             
         if not content:
             self.render_to_response('templates/m2py.html', d)
@@ -82,7 +60,7 @@ class M2PyHandler(webapp.RequestHandler, DjangoHandler):
                 log.ompc_converted = False
                 logging.error("Couldn't convert M code")
                 d['message'] += "<p>OMPC didn't like some of your syntax.</p>"
-
+            
             py_content = fout.getvalue()
             try:
                 co = compile(py_content, '__main__', 'exec')

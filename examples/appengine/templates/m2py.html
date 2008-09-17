@@ -24,16 +24,19 @@
         This will hopefully allow us to finalize it and remove the last 
         incomatibilities.
         </p>
-        <p>At the moment the compiler does not support syntax of the form
         
-        <b><i>IDENTIFIER var1 var2 -option</i></b>. For example 
-        <i>save var1 var2</i> will fail. You can use 
-        <i>save('var1', 'var2')</i>. The compiler will not complain, it will
-        simply treat the statement as a list of many statements.<br />
-        The rest should work, if not, we will repair it. You don't have to do 
-        anything beyond submiting m-files. It is important for us to collect 
-        as much data files as posisble for testing. The more diffrent styles
-        of coding we see the better.
+        <p style="color: orange;">Nothing longer than 5000 characters will 
+        be saved in the database. It will be processed and translated 
+        in the full length. It came to our attention that the Google 
+        Appengine does not like how long it takes to compile some programs.
+        In that case you might get message like the following:<br />
+        <span><pre style="color: white;">Traceback (most recent call last):
+...
+    raise errors[err.application_error](err.error_detail)
+Timeout</pre></span>
+        You can either try to submit a shorter source code or retry with 
+        the original. At this point we have no other solution other than 
+        relocating the service to a system over which we have complete control.
         </p>
         <p id="warning">The files you are uploading will be saved in our
         database. Please do not upload anything you wouldn't like us to see.</p>
@@ -78,4 +81,6 @@ end
         <div><input type="submit" value="Convert"></div>
     </form>
     </div>
+
+<p style="color: white; text-align: right;"><font size="1"><i>MATLAB</i>&copy; is a registered <i>trademark</i> of The <i>MathWorks</i>, Inc.</font></p>
 {% endblock %}

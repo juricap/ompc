@@ -16,42 +16,16 @@ class mslice:
 # TODO: make _get_nargout a static method of mfunction
 #
 
-def _get_nargout():
-    """Return how many values the caller is expecting.
-    """
-    import inspect, dis
-    f = inspect.currentframe()
-    f = f.f_back.f_back
-    c = f.f_code
-    i = f.f_lasti
-    bytecode = c.co_code
-    instruction = ord(bytecode[i+3])
-    if instruction == dis.opmap['UNPACK_SEQUENCE']:
-        howmany = ord(bytecode[i+4])
-        return howmany
-    elif instruction == dis.opmap['POP_TOP']:
-        # MATLAB always assumes at least 1 value
-        return 1
-    return 1
-
-class marray:
-    pass
-
-# def _build_return(N, *args):
-#     """Return only the first N variables specified by."""
-#     m, n, k = 12, marray(), 'aa'
-#     return (m, n, k)[:2]
-
 def _get_narginout():
     """Return how many values the caller is expecting.
     """
     import inspect, dis
     f = inspect.currentframe()
-    nargin = 0
-    innames = co.co_varnames[:f.f_code.co_varnames]
-    print innnames
-    print [ f.f_globals[x] for x in innames ]
-    
+    # step into the function that called us
+    fb = f.f_back
+    innames = fb.f_code.co_varnames[:fb.f_code.co_argcount]
+    nargin = len([ x for x in innames if fb.f_locals.get(x, None) ])
+    # nargout is one frame back
     f = f.f_back.f_back
     c = f.f_code
     i = f.f_lasti
@@ -59,57 +33,14 @@ def _get_narginout():
     instruction = ord(bytecode[i+3])
     if instruction == dis.opmap['UNPACK_SEQUENCE']:
         howmany = ord(bytecode[i+4])
-        return hargin, howmany
+        return nargin, howmany
     elif instruction == dis.opmap['POP_TOP']:
         # MATLAB always assumes at least 1 value
         return nargin, 1
     return nargin, 1
 
-
-def a(b=None,c=None):
-    nargin, nargout = _get_narginout()
-    if nargin < 2:
-        c = 1
-    k = locals().get('k', marray())
-    k(10).lvalue = 12
-    print nargout
-    return (a, b)[:nargout]
-
-# [(SetLineno, 2),
-#  (LOAD_GLOBAL, 'nargin'),
-#  (LOAD_CONST, 2),
-#  (COMPARE_OP, '<'),
-#  (JUMP_IF_FALSE, <byteplay.Label object at 0x0254C9F0>),
-#  (POP_TOP, None),
-#  (LOAD_CONST, 1),
-#  (STORE_FAST, 'c'),
-#  (JUMP_FORWARD, <byteplay.Label object at 0x0254C290>),
-#  (<byteplay.Label object at 0x0254C9F0>, None),
-#  (POP_TOP, None),
-#  (<byteplay.Label object at 0x0254C290>, None),
-#  (SetLineno, 3),
-#  (LOAD_GLOBAL, 'hasattr'),
-#  (LOAD_GLOBAL, 'locals'),
-#  (CALL_FUNCTION, 0),
-#  (LOAD_CONST, 'koko'),
-#  (CALL_FUNCTION, 2),
-#  (JUMP_IF_TRUE, <byteplay.Label object at 0x0254C3B0>),
-#  (POP_TOP, None),
-#  (LOAD_CONST, 2),
-#  (PRINT_ITEM, None),
-#  (PRINT_NEWLINE, None),
-#  (JUMP_FORWARD, <byteplay.Label object at 0x0254C3D0>),
-#  (<byteplay.Label object at 0x0254C3B0>, None),
-#  (POP_TOP, None),
-#  (<byteplay.Label object at 0x0254C3D0>, None),
-#  (SetLineno, 4),
-#  (LOAD_CONST, 12),
-#  (LOAD_GLOBAL, 'k'),
-#  (LOAD_CONST, 10),
-#  (CALL_FUNCTION, 1),
-#  (STORE_ATTR, 'lvalue'),
-#  (LOAD_CONST, None),
-#  (RETURN_VALUE, None)]
+class marray:
+    pass
 
 class mfunction:
     """Decorator that allows emulation of MATLAB's treatement of functions.
@@ -124,7 +55,8 @@ class mfunction:
         c = self._c
         
         # all return values must be initialized, for return (retvals)[:nargout]
-        # not necessary, the parser has to take care of this
+        # not necessary anymore, the parser has to take care of this
+        
         # check for maximum nargout, insert nargin nargout code
         self.__addnarg(c)
         # initialize novel variables, FIXME
@@ -189,29 +121,53 @@ class mfunction:
         
         self._c.code.extend(postfix)
 
-mfunction("out1, out2")
+@mfunction("out1, out2")
 def minmax(x):
     out1 = min(x)
     if nargout > 1:
         out2 = max(x)
+
+def error(msg):
+    raise OMPCException(msg)
+
+def _check_nargout(nargout, maxout):
+    if nargout > maxout:
+        error("Too manu output arguments!")
+
+#@mfunction("out1, out2")
+def test_ninout(b=None,c=None):
+    out1, out2 = None, None
+    nargin, nargout = _get_narginout()
+    _check_nargout(nargout, 2)
+    print '  nargin = %s, nargout = %d'%(nargin, nargout)
+    if nargin == 2:
+        out1 = b + c
+    elif nargin == 1:
+        k = marray()
+        out2 = '---'
+    k = locals().get('k', marray())
+    k(10).lvalue = 12
+    return (out1, out2)[:nargout]
 
 a = rand(1,10)
 print minmax(a)
 mi = minmax(a)
 mi, ma = minmax()
 
+a, b, c = test_ninout(3, 4)
+a, b = test_ninout(3, 4)
+
 class marrayview:
     def __init__(self, X):
         self._a = X
     def __setitem__(self, i, val):
-        print 'koko', i, val
+        print "  Setting [%r] to %r"%(i, val)
         self._a[i] = val
-        print self._a
     def __repr__(self):
         return repr(self._a)
 
 class marray(_N.ndarray):
-    
+        
     def __init__(self, shp=None, dtype='f8'):
         if shp is None:
             _N.ndarray.__init__(self, 0, dtype, order='FORTRAN')
@@ -229,32 +185,9 @@ class marray(_N.ndarray):
         args = [ type(x) is mslice \
                     and slice(x.start-1, x.stop-2, x.step) or x-1 \
                     for x in args ]
-        print args
-        print 'boooooooooo', self.marrayview(self.__getitem__(*args))
-        #return self[_N.array(args)-1]
-        return self.marrayview(self.__getitem__(*args))
+        
+        return marrayview(self.__getitem__(*args))
         #return self.__getitem__(*args)
-
-def _get_nargout():
-    """Return how many values the caller is expecting.
-    """
-    import inspect, dis
-    f = inspect.currentframe()
-    f = f.f_back.f_back
-    c = f.f_code
-    i = f.f_lasti
-    bytecode = c.co_code
-    instruction = ord(bytecode[i+3])
-    if instruction == dis.opmap['UNPACK_SEQUENCE']:
-        howmany = ord(bytecode[i+4])
-        return howmany
-    elif instruction == dis.opmap['POP_TOP']:
-        # MATLAB assumes 1 if there is none
-        return 1
-    return 1
-
-def error(msg):
-    raise OMPCException(msg)
 
 def find(cond):
     return _N.where(cond)[0] + 1
