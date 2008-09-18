@@ -360,6 +360,18 @@ def p_statement_function(p):
     else:
         fname = p[2]
         if '(' in p: argin = p[4]
+    # split argin and make all of them equal None
+    # if one of the is varargin, change it to *varargin
+    argin = [ x.strip() for x in argin.split(',') ]
+    last = []
+    if 'varargin' in argin:
+        if argin[-1] != 'varargin':
+            p_error(p)
+        argin.pop()
+        last = ['*varargin']
+    argin = ', '.join([ '%s=None'%x for x in argin ] + last)
+    if argout is None:
+        argout = ''
     p[0] = '@mfunction("%s")\ndef %s(%s):'%(argout, fname, argin)
     _func_name = fname
     _key_stack.append('function')
@@ -689,7 +701,8 @@ def p_expression_transpose(p):
 
 def p_expression_string(p):
     "expression : STRING"
-    p[0] = "mstring(%s)"%p[1]
+    #p[0] = "mstring(%s)"%p[1]
+    p[0] = p[1]
 
 def p_expression_indexflat(p):
     "indexflat : LPAREN ':' RPAREN"
@@ -780,13 +793,6 @@ yacc.yacc(debug=1)
 
 def translate(data, outfile=sys.stdout):
     """Entry point to the OMPC translator.
-    This function functions as a preprocessor. There are aspect of M-language
-    that are difficult (cause conflicts) to be solved by a parser. It is also 
-    much faster to implement some of the syntax by very simple checks.
-    The preprocessor
-     - combines continuations '...' (single line is submitted to the compiler)
-     - removes comments, but makes it possible to add them later
-     -
     """
     global _lineno, _last_line
     from re import sub, finditer
@@ -847,6 +853,14 @@ def _mysub(x):
 _cont = []
 def _ompc_preprocess(x):
     """OMPC preprocessor.
+    This function functions as a preprocessor. There are aspect of M-language
+    that are difficult (cause conflicts) to be solved by a parser. It is also 
+    much faster to implement some of the syntax by very simple checks.
+    
+    The preprocessor
+     - combines continuations '...' (single line is submitted to the compiler)
+     - removes comments, but makes it possible to add them later
+    
     Takes a single line of m-code and returns a tuple of
     stripped m-code and a comment.
     Continuation is requested by the 1st returned value set to None.

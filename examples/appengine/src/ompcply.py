@@ -61,7 +61,7 @@ states = (
 #     return t
 
 def t_LPAREN(t):
-    r'\('
+    r'[({]'
     t.lexer.push_state('inparen')
     return t
 
@@ -72,7 +72,7 @@ def t_inparen_END(t):
     return t
 
 def t_inparen_RPAREN(t):
-    r'\)'
+    r'[)}]'
     t.lexer.pop_state()
     return t
 
@@ -166,7 +166,8 @@ def t_STRING(t):
         t.lexer.lexpos = pos + 2
     elif prec in ' \t[{(=;,\n':
         # it's a string, translate "''" to 
-        t.value = t.value.replace("''", r"\'")
+        t.value = "'%s'"%t.value[1:-1].replace("\\", r"\\")
+        t.value = "'%s'"%t.value[1:-1].replace("''", r"\'")
     else:
         t.value = "'"
         t.type = "CONJTRANS"
@@ -279,7 +280,7 @@ def _print_error(*args, **kwargs):
         d = {'sep':sep, 'file':of}
         _print3000(**d)
         _print3000(*args, **d)
-        _print3000("On line: %d!"%(_lineno+1), **d)
+        _print3000("On line: %d!"%(_lineno), **d)
 
         
 def _pop_from_key_stack():
@@ -301,7 +302,7 @@ _knoend = list(_keywords)
 _knoend.remove('end')
 def _print_statement(x, send, p0):
     global _lvalues, _key_stack, _tabs
-    #print '--------------------', x, send, p0
+    # print '--------------------', x, send, p0
     finish = ''
     if p0 and p0.strip()[-1] not in ':;': finish = '; '
     res = x
@@ -318,7 +319,7 @@ def _print_statement(x, send, p0):
     #xs in _special or \
     elif xs in _keywords or \
          xs[:2] == '__' or xs in ['elif', 'else:']:
-        if xs not in ['end', 'break', 'continue', 'return']:
+        if xs not in ['end', 'break', 'continue', 'return', 'global']:
             dedent = True
     elif send is None or send == ',':
         # we need to print also the result
@@ -360,6 +361,18 @@ def p_statement_function(p):
     else:
         fname = p[2]
         if '(' in p: argin = p[4]
+    # split argin and make all of them equal None
+    # if one of the is varargin, change it to *varargin
+    argin = [ x.strip() for x in argin.split(',') ]
+    last = []
+    if 'varargin' in argin:
+        if argin[-1] != 'varargin':
+            p_error(p)
+        argin.pop()
+        last = ['*varargin']
+    argin = ', '.join([ '%s=None'%x for x in argin ] + last)
+    if argout is None:
+        argout = ''
     p[0] = '@mfunction("%s")\ndef %s(%s):'%(argout, fname, argin)
     _func_name = fname
     _key_stack.append('function')
@@ -488,7 +501,7 @@ def p_statement_persistent(p):
     if _func_name is None:
         _print_error('"persistent" outside of a function block!')
     p[0] = 'global __persistent__\n'
-    p[0] = "__persistent__['%s'] = '%s'"%(_func_name, p[2])
+    p[0] += "__persistent__['%s'] = '%s'"%(_func_name, p[2])
 
 def p_expression_list_space(p):
     '''list_spaces : list_spaces NAME'''
@@ -580,6 +593,12 @@ def p_expr_inlist2(p):
     '''exprinlist : exprinlist expression'''
     p[0] = '%s, %s'%(p[1], p[2])
 
+
+def p_expr_inlist_token(p):
+    '''exprinlist : exprinlist SEMICOLON
+                  | exprinlist COMMA'''
+    p[0] = p[1]
+
 def p_statement_empty(p):
     '''statement : empty'''
     p[0] = ''
@@ -668,7 +687,7 @@ def p_expr_mcat(p):
     p[0] = 'mcat(%s)'%p[1]
     
 def p_expression_list(p):
-    "exprmcat : LBRACKET exprinlist RBRACKET"
+    """exprmcat : LBRACKET exprinlist RBRACKET"""
     global _pinlist
     _pinlist = False
     p[0] = '[%s]'%p[2]
@@ -720,7 +739,9 @@ def p_expression_sub(p):
 
 def p_name_attr2(p):
     """name_attr : name_sub '.' NAME
-                 | name_attr '.' NAME"""
+                 | name_attr '.' NAME
+                 | name_attr '.' name_sub
+                 | name_sub '.' name_sub"""
     p[0] = '%s.%s'%(p[1], p[3])
 
 def p_name_attr(p):
@@ -732,7 +753,7 @@ def p_expression_attr(p):
     p[0] = p[1]
 
 def p_expression_sub2(p):
-    "name_sub : NAME LCURLY exprinlist RCURLY"
+    """name_sub : NAME LCURLY exprinlist RCURLY"""
     p[0] = '%s(%s)'%(p[1], p[3])
 
 def p_expression_items(p):
@@ -820,8 +841,9 @@ def translate_to_str(data):
 
 _xbuf = ''
 def _myparse(x, outfile=sys.stdout):
-    global _more, _xbuf, _outfile
+    global _more, _xbuf, _outfile, _last_line
     _outfile = outfile
+    _last_line = _xbuf + x
     ret = yacc.parse(_xbuf + x)
     if _more:
         # this takes care of the newline inside of [] and {}. We don't want 
@@ -851,7 +873,7 @@ def _ompc_preprocess(x):
     stripped m-code and a comment.
     Continuation is requested by the 1st returned value set to None.
     """
-    global _cont
+    global _cont, _pinlist
     from re import sub, findall, finditer
     # skip empty statements and take care of possible funny endlines 
     # only '\n' is allowed into the parser
@@ -884,13 +906,14 @@ def _ompc_preprocess(x):
     
     # FIXME should I make another parser just for this?
     LOC = ''.join(_cont)
-    toks = LOC.split()
-    if len(findall(r'[(){}\[\]=]', LOC)) == 0 and \
-                toks and toks[0] not in _keywords:
-        from re import split
-        names = [ x for x in split('[;,\s]*', LOC.strip()) if x ]
-        # names = LOC.split()
-        LOC = '%s(%s)'%( names[0], ', '.join([ "'%s'"%x for x in names[1:] ]) )
+    if not _pinlist:
+        toks = LOC.split()
+        if len(findall(r'[(){}\[\]=]', LOC)) == 0 and \
+                    toks and toks[0] not in _keywords:
+            from re import split
+            names = [ x for x in split('[;,\s]*', LOC.strip()) if x ]
+            # names = LOC.split()
+            LOC = '%s(%s)'%( names[0], ', '.join([ "'%s'"%x for x in names[1:] ]) )
     
     _cont = []
     return LOC, com
@@ -924,6 +947,7 @@ if __name__ == "__main__":
     print
     
     # the ompc prompt loop, break with Ctrl+C
+    _lineno = 1
     while 1:
         try:
             s = raw_input('ompc> ') + '\n'
