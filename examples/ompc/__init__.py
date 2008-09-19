@@ -7,10 +7,10 @@ def mfunction(names):
         from doc_comments import get_comment_doc
         doc = get_comment_doc(func)
         def func_new(*args):
-            return func(*args, **kwargs)
+            return func(*args)
         func_new.__doc__ = doc
         func_new.__name__ = func.__name__
-        func_new.__module__ = func.__module__
+        #func_new.__module__ = func.__module__
         return func_new
     return dec
 
@@ -74,8 +74,9 @@ def compile(source, filename, mode, flags=0, dont_inherit=0):
     else:
         raise ValueError("compile() arg 3 must be 'exec' or 'eval' or 'single'")
     pycode_str = PYM_TEMPLATE%{"pym_string": pycode_str}
-    co = __builtin__.compile(pycode_str, 
-                             filename[:-1]+'pym', mode, flags, dont_inherit)
+    pym = filename[:-1]+'pym'
+    open(pym, 'wb').write(pycode_str)
+    co = __builtin__.compile(pycode_str, pym, mode, flags, dont_inherit)
     # return the code object
     return co
 

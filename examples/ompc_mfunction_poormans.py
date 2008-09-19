@@ -105,9 +105,9 @@ def mfunction(outnames):
                                    'maxout': len(outnames.split(',')),
                                    'body': get_func_source(func),
                                    'outnames': outnames}
-        #func_new = compile(func_src, '<ompc>', 'exec')
         g = func.func_globals
         exec func_src in g
+        open('%s.temp.py'%func.func_name, 'wb').write(func_src)
         func_new = g[func.func_name]
         return func_new
     return dec
