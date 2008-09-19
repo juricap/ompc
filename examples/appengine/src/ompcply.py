@@ -61,7 +61,7 @@ states = (
 #     return t
 
 def t_LPAREN(t):
-    r'[({]'
+    r'\('
     t.lexer.push_state('inparen')
     return t
 
@@ -71,8 +71,15 @@ def t_inparen_END(t):
     t.type = 'NUMBER'
     return t
 
+def t_inlist_END(t):
+    'end'
+    # FIXME, this is wrong
+    t.value = 'end'
+    t.type = 'NUMBER'
+    return t
+
 def t_inparen_RPAREN(t):
-    r'[)}]'
+    r'\)'
     t.lexer.pop_state()
     return t
 
@@ -99,7 +106,9 @@ def t_LCURLY(t):
 
 def t_inlist_RCURLY(t):
     r'\}'
+    global _inparen
     t.lexer.pop_state()
+    _inparen = False
     return t
 
 t_COMMA = ','
@@ -280,7 +289,8 @@ def _print_error(*args, **kwargs):
         d = {'sep':sep, 'file':of}
         _print3000(**d)
         _print3000(*args, **d)
-        _print3000("On line: %d!"%(_lineno), **d)
+        _print3000("The line: %s"%_last_line, **d)
+        #_print3000("On line: %d!"%(_lineno), **d)
 
         
 def _pop_from_key_stack():

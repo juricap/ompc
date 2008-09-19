@@ -4,21 +4,19 @@ from glob import glob
 from imp import PKG_DIRECTORY, PY_COMPILED, PY_SOURCE
 import m_compile
 
-
-def load_mfunction(path, funcname):
-    print 'Loading m-function "%s" from "%s".'%(path, funcname)
-    return 
+M_COMPILABLE = ['.m']
 
 def get_mfiles(path):
     """Function returns all MATLAB imoportable files in the 'path' folder.
     """
-    #from glob import glob
     return glob(join(path,'*.m'))
 
 class MFileHooks(ihooks.Hooks):
 
     def load_source(self, name, filename, file=None):
         """Compile .m files."""
+        if splitext(filename)[1] not in M_COMPILABLE:
+            return ihooks.Hooks.load_source(self, name, filename, file)
         if file is not None:
             file.close()
         mfname = splitext(filename)[0]
@@ -26,7 +24,12 @@ class MFileHooks(ihooks.Hooks):
         m_compile.compile(filename, cfile)    # m-file compilation
         cfile = open(cfile, 'rb')
         try:
-            return self.load_compiled(name, filename, cfile)
+            print name, filename, cfile
+            module = self.load_compiled(name, filename, cfile)
+            #return module
+            # Python at this point returns a module, we can actually return the
+            # single function that is in it
+            return getattr(module, name)
         finally:
             cfile.close()                
  
@@ -121,10 +124,8 @@ __all__ = []
 if __name__ == "__main__":
     import sys
     sys.path += ['mfiles']
-    import dummy_m
-    print dummy_m.mfunction()
+    import add
+    print add
+    help(add)
     
-    import dummy_dir
-    print dir(dummy_dir)
-    
-    from dummy_dir import *
+    print add(1,2)

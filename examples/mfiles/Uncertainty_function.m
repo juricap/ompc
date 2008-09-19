@@ -13,16 +13,6 @@ disp(sprintf('f(7) = %f',f(7)));
 
 disp('Let''s start with parameters');
 
-disp dummy
-disp 12
-disp 12 13 'koko'
-dummy = [ 1, 2, 3;
-          4, 5, 6 ];
-dummy2 = [ 1, 2, 3
-          4, 5, 6 ];
-
-if dummy(1) == 1, koko = 1, else, koko = 2; end
-
 L1 = 0.0055;        %0.0055;
 L2 = 0.001;         %0.00096;
 L3 = 0.2;           %0.2
