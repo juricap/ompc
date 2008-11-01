@@ -295,14 +295,17 @@ def p_statement_list(p):
     '''statement_list : statement
                       | statement COMMA
                       | statement SEMICOLON'''
-    p[0] = _print_statement(p[1], len(p) > 2 and p[2] or None, p[0])
+    if p[1] and p[1][-1] == ';':
+        p[0] = _print_statement(p[1][:-1], ';', p[0])
+    else:
+        p[0] = _print_statement(p[1], len(p) > 2 and p[2] or None, p[0])
 
 _lvalues = []
 _knoend = list(_keywords)
 _knoend.remove('end')
 def _print_statement(x, send, p0):
     global _lvalues, _key_stack, _tabs
-    # print '--------------------', x, send, p0
+    #print >>sys.stderr, '###', x, send, p0
     finish = ''
     if p0 and p0.strip()[-1] not in ':;': finish = '; '
     res = x
@@ -333,10 +336,16 @@ def _print_statement(x, send, p0):
     return res
 
 def p_statement_list2(p):
-    '''statement_list : statement_list statement
+    '''statement_list : statement_list SEMICOLON statement
                       | statement_list COMMA statement
-                      | statement_list SEMICOLON statement'''
-    p[0] = _print_statement('\n'+p[-1], len(p)>3 and p[2] or None, p[0])
+                      | statement_list statement'''
+    # the statement list has been printed already
+    p[0] = _print_statement('\n'+p[-1], p[-1][-1] == ';' and ';' or None, p[0])
+
+def p_statement_finished(p):
+    '''statement : statement SEMICOLON
+                 | statement COMMA'''
+    p[0] = p[1] + (p[2] == ';' and ';' or '')
 
 def p_statement_expr(p):
     '''statement : expression'''
@@ -639,12 +648,17 @@ def p_expression_binop(p):
                   | expression OR expression'''
     if p[2] == '+'  : p[0] = '%s + %s'%(p[1], p[3])
     elif p[2] == '-'  : p[0] = '%s - %s'%(p[1], p[3])
-    elif p[2] == '*'  : p[0] = '%s * %s'%(p[1], p[3])
-    elif p[2] == '/'  : p[0] = '%s / %s'%(p[1], p[3])
+    #elif p[2] == '*'  : p[0] = '%s * %s'%(p[1], p[3])
+    elif p[2] == '*'  : p[0] = 'dot(%s, %s)'%(p[1], p[3])
+    #elif p[2] == '/'  : p[0] = '%s / %s'%(p[1], p[3])
+    elif p[2] == '/'  : p[0] = 'linalg.solve(%s, %s)'%(p[1], p[3])
     elif p[2] == '^'  : p[0] = '%s ** %s'%(p[1], p[3])
-    elif p[2] == '.*'  : p[0] = '%s *elmul* %s'%(p[1], p[3])
-    elif p[2] == './'  : p[0] = '%s /eldiv/ %s'%(p[1], p[3])
-    elif p[2] == '.^'  : p[0] = '%s **elpow** %s'%(p[1], p[3])
+    #elif p[2] == '.*'  : p[0] = '%s *elmul* %s'%(p[1], p[3])
+    elif p[2] == '.*'  : p[0] = '%s * %s'%(p[1], p[3])
+    #elif p[2] == './'  : p[0] = '%s /eldiv/ %s'%(p[1], p[3])
+    elif p[2] == './'  : p[0] = '%s / %s'%(p[1], p[3])
+    #elif p[2] == '.^'  : p[0] = '%s **elpow** %s'%(p[1], p[3])
+    elif p[2] == '.^'  : p[0] = '%s ** %s'%(p[1], p[3])
     # conditional and logical
     elif p[2] == '~='  : p[0] = '%s != %s'%(p[1], p[3])
     elif p[2] == '=='  : p[0] = '%s == %s'%(p[1], p[3])
@@ -654,6 +668,45 @@ def p_expression_binop(p):
     elif p[2] == '>='  : p[0] = '%s >= %s'%(p[1], p[3])
     elif p[2] == '&'  : p[0] = 'logical_and(%s, %s)'%(p[1], p[3])
     elif p[2] == '|'  : p[0] = 'logical_or(%s, %s)'%(p[1], p[3])
+    elif p[2] == '&&'  : p[0] = '%s and %s'%(p[1], p[3])
+    elif p[2] == '||'  : p[0] = '%s or %s'%(p[1], p[3])
+
+def p_expression_binop(p):
+    '''expression : expression '+' expression
+                  | expression '-' expression
+                  | expression '*' expression
+                  | expression '/' expression
+                  | expression '^' expression
+                  | expression DOTTIMES expression
+                  | expression DOTDIVIDE expression
+                  | expression DOTPOWER expression
+                  | expression NOTEQUAL expression
+                  | expression ISEQUAL expression
+                  | expression LESS expression
+                  | expression GREATER expression
+                  | expression LESSEQUAL expression
+                  | expression GREATEREQUAL expression
+                  | expression ELAND expression
+                  | expression ELOR expression
+                  | expression AND expression
+                  | expression OR expression'''
+    if p[2] == '+'  : p[0] = '%s + %s'%(p[1], p[3])
+    elif p[2] == '-'  : p[0] = '%s - %s'%(p[1], p[3])
+    elif p[2] == '*'  : p[0] = '_N.dot(%s, %s)'%(p[1], p[3])
+    elif p[2] == '/'  : p[0] = '_N.linalg.solve(%s, %s)'%(p[1], p[3])
+    elif p[2] == '^'  : p[0] = '_N.array(_N.matrix(%s) ** %s)'%(p[1], p[3])
+    elif p[2] == '.*'  : p[0] = '%s * %s'%(p[1], p[3])
+    elif p[2] == './'  : p[0] = '%s / %s'%(p[1], p[3])
+    elif p[2] == '.^'  : p[0] = '%s ** %s'%(p[1], p[3])
+    # conditional and logical
+    elif p[2] == '~='  : p[0] = '%s != %s'%(p[1], p[3])
+    elif p[2] == '=='  : p[0] = '%s == %s'%(p[1], p[3])
+    elif p[2] == '<'  : p[0] = '%s < %s'%(p[1], p[3])
+    elif p[2] == '>'  : p[0] = '%s > %s'%(p[1], p[3])
+    elif p[2] == '<='  : p[0] = '%s <= %s'%(p[1], p[3])
+    elif p[2] == '>='  : p[0] = '%s >= %s'%(p[1], p[3])
+    elif p[2] == '&'  : p[0] = '_N.logical_and(%s, %s)'%(p[1], p[3])
+    elif p[2] == '|'  : p[0] = '_N.logical_or(%s, %s)'%(p[1], p[3])
     elif p[2] == '&&'  : p[0] = '%s and %s'%(p[1], p[3])
     elif p[2] == '||'  : p[0] = '%s or %s'%(p[1], p[3])
 
@@ -708,7 +761,8 @@ def p_expression_transpose(p):
 
 def p_expression_string(p):
     "expression : STRING"
-    p[0] = "mstring(%s)"%p[1]
+    #p[0] = "mstring(%s)"%p[1]
+    p[0] = p[1]
 
 def p_expression_indexflat(p):
     "indexflat : LPAREN ':' RPAREN"
@@ -906,9 +960,15 @@ def _ompc_preprocess(x):
     
     # FIXME should I make another parser just for this?
     LOC = ''.join(_cont)
+    tname = t_NAME.__doc__
+    tnum = t_NUMBER.__doc__
     if not _pinlist:
+        from re import match
+        mf2 = match(r'%(NAME)s\s+(%(NAME)s|%(NUMBER)s).*'% \
+                            {'NAME':tname, 'NUMBER':tnum}, LOC)
         toks = LOC.split()
-        if len(findall(r'[(){}\[\]=]', LOC)) == 0 and \
+        #if len(findall(r'[(){}\[\]=]', LOC)) == 0 and \
+        if mf2 is not None and \
                     toks and toks[0] not in _keywords:
             from re import split
             names = [ x for x in split('[;,\s]*', LOC.strip()) if x ]
@@ -918,10 +978,46 @@ def _ompc_preprocess(x):
     _cont = []
     return LOC, com
 
+def test():
+    global _print_error
+    _print_error = _print
+    testf = file('ompcply.test', 'rU')
+    next = testf.readline()
+    while next:
+        if not next.strip() or next.lstrip().startswith('#'):
+            next = testf.readline()
+            continue
+        test = []
+        if next.lstrip().startswith('ompc>'):
+            test += [ next.lstrip()[5:].strip() ]
+            next = testf.readline()
+        while next.lstrip().startswith('...'):
+            test += [ next.lstrip()[5:].strip() ]
+            next = testf.readline()
+        expect = []
+        while next.strip():
+            expect += [ next.strip() ]
+            next = testf.readline()
+        
+        # run the translation
+        print 'Testing ...'
+        print '\n'.join(test)
+        out = translate_to_str('\n'.join(test))
+        # check the output
+        if "__error__" in test:
+            assert 'On line' in out
+        else:
+            print 'Output:', out
+            good = True
+            for o, r in zip(out.split('\n'), expect):
+                print '+', o, r, o.strip() == r.strip()
+                good &= o.split() == r.split()
+            print '=========', good and 'Pass' or 'Failed'
 
 usage = """\
 ompcply.py            - to get ompc compiler test console
 ompcply.py lexdebug   - to get the console with debug output from tokenizer.
+ompcply.py test       - to run tests in 'ompcply.test'.
 ompcply.py file.m     - will translate an m-file to OMPC .pym file.
 
 The output is always to the standard output.
@@ -935,6 +1031,9 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         if sys.argv[1] == 'lexdebug':
             LEXDEBUG = 1
+        elif sys.argv[1] == 'test':
+            test()
+            sys.exit()
         else:
             if not os.path.exists(sys.path[1]):
                 print usage
