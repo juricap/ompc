@@ -24,7 +24,7 @@ def _get_narginout():
 
 def _check_nargout(nargout, maxout):
     if nargout > maxout:
-        error("Too manu output arguments!")
+        error("Too many output arguments!")
 
 def get_source(obj):
     """Get object's source code. Returns None when source can't be found.
@@ -88,7 +88,7 @@ def %(name)s(%(args)s):
     """%(doc)s"""
     nargin, nargout = _get_narginout()
     if nargout > %(maxout)d:
-        error("Too manu output arguments!")
+        error("Too many output arguments!")
 %(body)s
     return (%(outnames)s,)[:nargout]
 '''

@@ -112,6 +112,21 @@ class MFileLoader(ihooks.ModuleLoader):
             return ihooks.ModuleLoader.find_module_in_dir(
                 self, name, dir, allow_packages)
 
+def addpath(*args):
+    import sys
+    pos = None
+    last = args[-1]
+    if last.lower() in ['-begin', '-end', '-frozen']:
+        args = args[:-1]
+        if last.lower() == '-begin':
+            pos = 0
+        elif sys.platform.startswith('win') and last.lower() == '-frozen':
+            raise NotImplementedError()
+    if pos is None:
+        sys.path += list(args)
+    else:
+        sys.path.insetr(pos, list(args))
+
 def install():
     """Install the import hook"""
     ihooks.install(ihooks.ModuleImporter(MFileLoader(MFileHooks())))
@@ -119,13 +134,12 @@ def install():
 install()
 
 # don't export anything
-__all__ = []
+__all__ = ['addpath']
 
 if __name__ == "__main__":
-    import sys
-    sys.path += ['mfiles']
+    addpath('mfiles')
     import add
+    print add(1,2)
+    
     print add
     help(add)
-    
-    print add(1,2)

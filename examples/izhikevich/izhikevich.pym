@@ -1,0 +1,34 @@
+
+# Created by Eugene M. Izhikevich, February 25, 2003
+# Excitatory neurons   Inhibitory neurons
+Ne = 800
+Ni = 200
+
+re = rand(Ne, 1)
+ri = rand(Ni, 1)
+
+a = mcat([0.02 * ones(Ne, 1), OMPCSEMI, 0.02 + 0.08 * ri])
+b = mcat([0.2 * ones(Ne, 1), OMPCSEMI, 0.25 - 0.05 * ri])
+c = mcat([-65 + 15 * re **elpow** 2, OMPCSEMI, -65 * ones(Ni, 1)])
+d = mcat([8 - 6 * re **elpow** 2, OMPCSEMI, 2 * ones(Ni, 1)])
+S = mcat([0.5 * rand(Ne + Ni, Ne), -rand(Ne + Ni, Ni)])
+
+v = -65 * ones(Ne + Ni, 1)# Initial values of v
+u = b *elmul* v# Initial values of u
+firings = mcat([])# spike timings
+
+for t in mslice[1:1000]:# simulation of 1000 ms
+    print t
+    I = mcat([5 * randn(Ne, 1), OMPCSEMI, 2 * randn(Ni, 1)])# thalamic input
+    fired = find(v >= 30)# indices of spikes
+    if not isempty(fired):
+        firings = mcat([firings, OMPCSEMI, t + 0 * fired, fired])
+        v(fired).lvalue = c(fired)
+        u(fired).lvalue = u(fired) + d(fired)
+        I = I + sum(S(mslice[:], fired), 2)
+    end
+    v = v + 0.5 * (0.04 * v **elpow** 2 + 5 * v + 140 - u + I)
+    v = v + 0.5 * (0.04 * v **elpow** 2 + 5 * v + 140 - u + I)
+    u = u + a *elmul* (b *elmul* v - u)
+end
+plot(firings(mslice[:], 1), firings(mslice[:], 2), mstring('.'))
