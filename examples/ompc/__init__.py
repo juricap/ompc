@@ -311,6 +311,9 @@ def addpath(*args):
     else:
         sys.path.insetr(pos, list(args))
 
+import __main__
+__main__.__dict__['addpath'] = addpath
+
 def install():
     """Install the import hook"""
     ihooks.install(ihooks.ModuleImporter(MFileLoader(MFileHooks())))
