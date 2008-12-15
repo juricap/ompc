@@ -2,7 +2,7 @@
 # This file is a part of OMPC (http://ompc.juricap.com/)
 # 
 # for testing:
-#  import ompclib_numpy; reload(ompclib_numpy); from ompclib_numpy import *
+#  import ompclib_numpy2; reload(ompclib_numpy2); from ompclib_numpy2 import *
 
 # TODO
 # - remove all references to array, use "ompc_base._init_data" instead
@@ -27,7 +27,7 @@ _dtype2numpy = {'double': 'f8', 'single': 'f4',
 class mvar(object):
     @staticmethod
     def _DataObject(dtype, data):
-        return np.array(data, dtype=_dtype2numpy[dtype]).reshape(-1)
+        return np.array(data, dtype=_dtype2numpy[dtype])
     
     def __new__(cls, *args, **kwargs):
         a = super(mvar, cls).__new__(cls, *args, **kwargs)
@@ -142,81 +142,6 @@ def _size(X, d=None):
     else:
         return res[d]
 
-def _ndi(*i):
-    """Returns a generator of tuples that iterate over elements specified
-    by slices and indices in `i`."""
-    from itertools import chain, repeat, cycle, izip
-    r = lambda x: range(x.start, x.stop, x.step is None and 1 or x.step)
-    res = []
-    for x in i:
-        if isinstance(x, slice): res.append(r(x))
-        elif _isscalar(x): res.append([x])
-        else: res.append(x)
-    i = res
-    cp = 1
-    gs = []
-    for x in i[:-1]:
-        gs += [ cycle(chain(*(repeat(j,cp) for j in x))) ]
-        cp *= len(x)
-    gs += [ chain(*(repeat(j,cp) for j in i[-1])) ]
-    return izip(*gs)
-
-def _ndilin(shp, *i):
-    """Generator of linear indices into an array of shape `shp`. Indices are
-    specified by slices of indices in `i`."""
-    cp = [1]
-    for x in shp[:-1]:
-        cp += [cp[-1]*x]
-    i = list(i)
-    for j, x in enumerate(i):
-        if isinstance(x, slice):
-            start, stop, step = x.start, x.stop, x.step
-            if x.start is None: start = 0
-            if x.stop == sys.maxint or x.stop is None: stop = shp[j]
-            if x.step is None: step = 1
-            i[j] = slice(start, stop, step)
-    res = []
-    for x in _ndi(*i):
-        res.append(int(np.sum(np.array(cp)*x)))
-    return res
-
-def _ndi1(*i):
-    """Returns a generator of tuples that iterate over elements specified
-    by slices and indices in `i`.
-    The index base of input parameters is 1."""
-    from itertools import chain, repeat, cycle, izip
-    r = lambda x: _marray.frommslice(x)
-    res = []
-    for x in i:
-        if isinstance(x, slice): res.append(r(x))
-        elif _isscalar(x): res.append([x])
-        else: res.append(x)
-    i = res
-    cp = 1
-    gs = []
-    for x in i[:-1]:
-        gs += [ cycle(chain(*(repeat(j,cp) for j in x))) ]
-        cp *= len(x)
-    gs += [ chain(*(repeat(j,cp) for j in i[-1])) ]
-    return izip(*gs)
-
-def _ndilin1(shp, *i):
-    """Generator of linear indices into an array of shape `shp`. Indices are
-    specified by slices of indices in `i`.
-    The input index is base 1 the linear indices returned are base 0.
-    This function produces indices, threfore the output type is 'int'."""
-    cp = [1]
-    for x in shp[:-1]:
-        cp += [cp[-1]*x]
-    i = list(i)
-    for j, x in enumerate(i):
-        if isinstance(x, _mslice) and x.hasnoend():
-            i[j] = x.evaluate_end(shp[j])
-    res = []
-    for x in _ndi1(*i):
-        res.append(int(np.sum(cp[:len(x)]*(np.array(x)-1))))
-    return res
-
 def _ndshape(msize, *i):
     """Determine the shape of a view on A with slicing specified in `i`.
     """
@@ -245,6 +170,8 @@ def _ndshape1(msize, *i):
         if isinstance(x, _mslice):
             if x.hasnoend():
                 shp.append( len(mslice[x.start:x.step:msize[idim]]) )
+            else:
+                shp.append( len(x) )
         elif _isscalar(x):
             shp.append(1)
         elif hasattr(x, '__len__'):
@@ -261,34 +188,27 @@ def _ndshape1(msize, *i):
         else: shp.append(1)
     return shp
 
-def find(cond):
-    """Return linear index of elements where the condition is True.
-    The index is based on 1."""
-    res = []
-    for i, x in enumerate(cond):
-        if bool(x): res.append(i+1)
-    shp = _size(cond)
-    if shp[0] > 1:
-        if shp[1] > 1: shp = (len(res), 1)
-        else: shp = (len(res), 1)
-    elif shp[1] > 1:
-        shp = (1, len(res))
-    else:
-        shp = (len(res), 1)
-    return _marray('double', shp, res)
-
 def isempty(A):
     return np.prod(A.msize) == 0
 
 def _dot(A, B):
     if not isinstance(A, _marray) or not isinstance(B, _marray):
         raise NotImplementedError("arguments must be 'marray's.")
-    return np.dot(B.reshape(B.msize), A.reshape(A.msize[::-1])).T
+    return np.dot(B.reshape(B.msize), A).T
 
 def _squeeze(A):
     res = A.__copy__()
     res.msize = [ x for x in res.msize if x > 1 ]
     return res
+
+def _msize(*args):
+    if len(args) == 1 and hasattr(args, '__len__'):
+        args = args[0]
+    if len(args) > 2 and args[-1] == 1: args = args[:-1]
+    if len(args) == 1:
+        if construct: args = (args[0], args[0])
+        else: args = (args[0], 1)
+    return args
 
 def print_marray(A, ans=True):
     pre = ''
@@ -303,7 +223,7 @@ def print_marray(A, ans=True):
             pre += print_marray(sA, False)
         return pre
     else:
-        return str(A._a.reshape(A.msize[::-1]).T) + '\n\n'
+        return str(A._a.T) + '\n\n'
 
 class _marray(mvar):
     
@@ -313,16 +233,16 @@ class _marray(mvar):
     
     @staticmethod
     def zeros(shp, dtype):
-        na = _marray(dtype, (0,0))
-        na._a = np.zeros(np.prod(shp), _dtype2numpy[dtype])
-        na.msize = shp
+        na = _marray(dtype, shp)
+        na._a.flat[:] = 0 #np.zeros(na.msize[::-1], _dtype2numpy[dtype])
+        #na.msize = shp
         return na
     
     @staticmethod
     def ones(shp, dtype):
-        na = _marray(dtype, (0,0))
-        na._a = np.ones(np.prod(shp), _dtype2numpy[dtype])
-        na.msize = shp
+        na = _marray(dtype, shp)
+        na._a.flat[:] = 1 #np.ones(na.msize[::-1], _dtype2numpy[dtype])
+        #na.msize = shp
         return na
     
     def __init__(self, dtype, msize, a=None):
@@ -330,13 +250,13 @@ class _marray(mvar):
         if not isSequenceType(msize):
             msize = (msize, msize)
         elif len(msize) == 1:
-            msize = (1, 1)
+            msize = (msize[0], 1)
         if a is None:
-            self._a = np.empty(np.prod(msize), _dtype2numpy[dtype])
+            self._a = np.empty(msize[::-1], _dtype2numpy[dtype])
         elif isinstance(a, np.ndarray):
             self._a = a
         else:
-            self._a = np.array(a, _dtype2numpy[dtype]).reshape(-1)
+            self._a = np.array(a, _dtype2numpy[dtype]).reshape(msize[::-1])
         self.msize = msize
         self.dtype = dtype
     
@@ -401,15 +321,10 @@ class _marray(mvar):
     def __len__(self):
         return max(self.msize)
     
-    # same interface as __getitem__ but 1-based indexing
-    # def __call__(self, *i):
-    #     return self.__getitem1__(i)
-    
     def __getitem__(self, i):
         # determine the size of the new array
         nshp = _ndshape(self.msize, *i)
-        ins = list(_ndilin(self.msize, *i))
-        return _marray(self.dtype, nshp, [ self._a[i] for i in ins ])
+        return _marray(self.dtype, nshp, self._a.__getitem__(reversed(i)))
     
     # >> a = reshape(1:15,5,3)
     # >> a(eye(3)==1)
@@ -418,33 +333,56 @@ class _marray(mvar):
         # determine the size of the new array
         nshp = _ndshape1(self.msize, *i)
         ri = []
-        for x in i:
-            if isinstance(x, _marray): ri.append(x._a)
-            else: ri.append(x)
-        ins = list(_ndilin1(self.msize, *ri))
-        return _marray(self.dtype, nshp, self._a[ins])
+        if len(i) == 1:
+            if self.msize[0] == 1: ri = (i[0]._a.astype('i4').reshape(-1)-1, 0)
+            elif self.msize[1] == 1: ri = (0, i[0]._a.astype('i4').reshape(-1)-1)
+            else:
+                raise NotImplementedError()
+        else:
+            di = len(self.msize)-1
+            for x in reversed(i):
+                if isinstance(x, _marray): ri.append(x._a.astype('i4').reshape(-1)-1)
+                elif isinstance(x, _mslice): ri.append(x.__base0__(self.msize[di]))
+                else: ri.append(x-1)
+                di -= 1
+        na = self._a.__getitem__(ri)
+        return _marray(self.dtype, nshp, na.reshape(nshp[::-1]))
     
     def __setitem__(self, i, val):
         if isinstance(val, _marray): val = val._a
         ins = list(_ndilin(self.msize, *ri))
-        self._a[i] = val
+        self._a.__setitem__(reversed(i), val)
     
     def __setitem1__(self, i, val):
         # determine the size of the new array
         nshp = _ndshape1(self.msize, *i)
-        ri = []
-        for x in i:
-            if isinstance(x, _marray): ri.append(x._a)
-            else: ri.append(x)
-        ins = list(_ndilin1(self.msize, *ri))
         if isinstance(val, _marray): val = val._a
-        self._a[ins] = val
+        ri = []
+        if len(i) == 1:
+            # stupid numpy a = rand(1,10); b = rand(1,2); a[0,[3,4]] = b
+            # doesn't work
+            if self.msize[0] == 1:
+                ri = (i[0]._a.astype('i4').reshape(-1)-1, 0)
+                val = val[0]
+            elif self.msize[1] == 1:
+                ri = (0, i[0]._a.astype('i4').reshape(-1)-1)
+                val = val[0]
+            else:
+                raise NotImplementedError()
+        else:
+            di = len(self.msize)-1
+            for x in reversed(i):
+                if isinstance(x, _marray): ri.append(x._a.astype('i4').reshape(-1)-1)
+                elif isinstance(x, _mslice): ri.append(x.__base0__(self.msize[di]))
+                else: ri.append(x-1)
+                di -= 1
+        self._a.__setitem__(ri, val)
     
     # properties
     def transposed(self):
         assert len(self.msize) == 2
         return _marray(self.dtype, self.msize[::-1], 
-                        self._a.reshape(self.msize[::-1]).T.flat.copy())
+                        self._a.T.flat.copy())
     T = property(transposed, None, None, "Transpose.")
     
     # IO
@@ -573,6 +511,12 @@ class _mslice(mvar):
         self.init_data()
         return _marray(self.dtype, self.msize, self._a.copy())
 
+    def __base0__(self,shp=None):
+        if self.hasnoend():
+            assert shp is not None
+            return slice(self.start-1, shp, self.step)
+        return slice(self.start-1, self.stop, self.step)
+
 class _mslice_helper:
     def __getitem__(self, i):
         s = _mslice.__new__(_mslice)
@@ -690,7 +634,7 @@ def mcat(i):
     out = empty((final_rows, final_cols), 'double')
     for sl, x in _izip(pos, i):
         if x is not Ellipsis:
-            if isinstance(x, _marray): x = x._a.reshape(x.msize[::-1]).T
+            if isinstance(x, _marray): x = x._a.T
             out._a.reshape(final_cols, final_rows).T.__setitem__(sl, x)
     return out
 
@@ -702,14 +646,14 @@ def rand(*args):
         raise NotImplemented
     if len(args) == 1:
         args = (args[0], args[0])
-    return _marray('double', args, np.random.rand(*args[::-1]).reshape(-1))
+    return _marray('double', args, np.random.rand(*args[::-1]))
 
 def randn(*args):
     if isinstance(args[0], str):
         raise NotImplemented
     if len(args) == 1:
         args = (args[0], args[0])
-    return _marray('double', args, np.random.randn(*args[::-1]).reshape(-1))
+    return _marray('double', args, np.random.randn(*args[::-1]))
 
 def reshape(A, *newsize):
     if len(newsize) == 0:
@@ -747,13 +691,21 @@ def sum(A, *dimtype):
     nshp[dim-1] = 1
     if len(nshp) > 2 and nshp[-1] == 1: nshp = nshp[:-1]
     # use numpy's sum
-    a = np.sum(A._a.reshape(A.msize[::-1]), len(msize)-dim)
-    return _marray(A.dtype, nshp, a.reshape(-1))
+    a = np.sum(A._a, len(msize)-dim)
+    return _marray(A.dtype, nshp, a)
+
+def find(cond):
+    a = mpl.find(cond._a.reshape(-1)) + 1
+    msize = (len(a), 1)
+    if len(cond.msize) == 2 and cond.msize[0] == 1:
+        msize = (1, len(a))
+    return _marray('double', msize, a.astype('f8').reshape(msize[::-1]))
 
 def plot(*args):
+    #print [ x.msize for x in args ]
     nargs = []
     for x in args:
-        if isinstance(x, _marray): nargs.append(np.squeeze(x._a.reshape(x.msize[::-1]).T))
+        if isinstance(x, _marray): nargs.append(x._a.T)
         elif isinstance(x, mstring): nargs.append(str(x))
         else: nargs.append(x)
     mpl.plot(*nargs)
