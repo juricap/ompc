@@ -1,5 +1,6 @@
 
 import sys
+sys.path += ['..']
 from ompcply import translate_to_str
 
 __all__ = ['mfunction', '_get_narginout', 'compile', 'addpath']
@@ -311,6 +312,9 @@ def addpath(*args):
     else:
         sys.path.insetr(pos, list(args))
 
+import __main__
+__main__.__dict__['addpath'] = addpath
+        
 def install():
     """Install the import hook"""
     ihooks.install(ihooks.ModuleImporter(MFileLoader(MFileHooks())))
@@ -318,6 +322,6 @@ def install():
 install()
 
 if __name__ == "__main__":
-    pth = '../mfiles/'
+    pth = '../examples/mfiles/'
     src = file(pth+'Uncertainty_function.m','U').read()
     print get_pym_string(src)
