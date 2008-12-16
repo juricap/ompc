@@ -2,7 +2,7 @@
 # This file is a part of OMPC (http://ompc.juricap.com/)
 # 
 # for testing:
-#  import ompclib_numpy2; reload(ompclib_numpy2); from ompclib_numpy2 import *
+#  import ompclib_numpy; reload(ompclib_numpy); from ompclib_numpy import *
 
 # TODO
 # - remove all references to array, use "ompc_base._init_data" instead
