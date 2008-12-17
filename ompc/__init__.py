@@ -3,7 +3,7 @@ import sys, os
 sys.path += [os.path.abspath('.'), os.path.abspath('..')]
 from ompcply import translate_to_str
 
-__all__ = ['mfunction', '_get_narginout', 'compile', 'addpath']
+__all__ = ['mfunction', '_get_narginout', 'compile']
 
 def mfunction_simple(names):
     def dec(func):
@@ -299,25 +299,29 @@ class MFileLoader(ihooks.ModuleLoader):
             return ihooks.ModuleLoader.find_module_in_dir(
                 self, name, dir, allow_packages)
 
-# populate the __main__ namespace with OMPCbase functions
-import __main__
-import ompclib
-
-_ns = __main__
-# IPython needs special treatment
-if hasattr(_ns, '__IP'):
-    _ns = _ns.__IP.user_ns
-else:
-    _ns = __main__.__dict__
-
-for x in ompclib.__ompc_all__:
-    _ns[x] = getattr(ompclib, x)
-
 def install():
     """Install the import hook"""
     ihooks.install(ihooks.ModuleImporter(MFileLoader(MFileHooks())))
 
-install()
+# populate the __main__ namespace with OMPCbase functions
+import __main__
+if not hasattr(__main__, '__OMPC'):
+    import ompclib
+    _ns = __main__
+    # IPython needs special treatment
+    if hasattr(_ns, '__IP'):
+        _ns = _ns.__IP.user_ns
+    else:
+        _ns = __main__.__dict__
+    
+    for x in ompclib.__ompc_all__:
+        _ns[x] = getattr(ompclib, x)
+    
+    from ompclib import *
+    __all__ += ompclib.__ompc_all__
+    
+    install()
+    __main__.__OMPC = True
 
 if __name__ == "__main__":
     pth = '../examples/mfiles/'

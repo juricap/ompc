@@ -9,4 +9,5 @@ class mcellarray(list):
 m = mcellarray()
 tic()
 for i in xrange(100000): m[i] = 12
+
 toc()
