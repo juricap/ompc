@@ -305,10 +305,10 @@ def print_marray(A, ans=True):
     if A.dtype == 'complex': nstr = complexstr
     pre = ''
     if ans:
-        pre = '\nans = \n\n'
+        pre = '\nans = \n'
     if len(A.msize) > 2:
         for i in _ndi(*[slice(0,x) for x in A.msize[2:]]):
-            pre += '(:, :, %s)\n\n'%', '.join([str(x+1) for x in i])
+            pre += '\n(:, :, %s)\n'%', '.join([str(x+1) for x in i])
             cur = (slice(0,A.msize[0]), slice(0, A.msize[1])) + i
             sA = A.__getitem__(cur)
             sA.msize = A.msize[:2]
@@ -325,9 +325,10 @@ def print_marray(A, ans=True):
         else: rows = [ srow(i) for i in xrange(3) ] + \
                      [('...',)] + \
                      [ srow(i) for i in [M-3,M-2,M-1] ]
-        res = pre + '  ' + \
+        res = pre + '\n  ' + \
             '\n  '.join(', '.join(map(nstr,x)) for x in rows)
         if ans: res += '\n\n'
+        else: res += '\n'
         return res
 
 @_ompc_base
