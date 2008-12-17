@@ -216,7 +216,8 @@ class MFileHooks(ihooks.Hooks):
         m_compile.compile(filename, cfile)    # m-file compilation
         cfile = open(cfile, 'rb')
         try:
-            print name, filename, cfile
+            # print name, filename, cfile
+            print 'Importing m-file: "%s"'%filename
             module = self.load_compiled(name, filename, cfile)
             #return module
             # Python at this point returns a module, we can actually return the
