@@ -34,6 +34,7 @@ _dtype2numpy = {'complex': 'complex128',
                 'int32': 'i4', 'uint32': 'u4',
                 'int16': 'i2', 'uint16': 'u2',
                 'int8': 'i1', 'uint8': 'u1',
+                'char': 'u1',
                 'bool': 'bool',
                }
 
@@ -178,9 +179,21 @@ def _typegreater(Adt, Bdt):
     """Returns type with higher precision."""
     return _dsize_dict[Adt] >= _dsize_dict[Bdt] and Adt or Bdt
 
+def _dtype(X):
+#     from operator import isSequenceType
+#     while isSequenceType(X):
+#         X = X[0]
+#     res = tuple(reversed(shp))
+    # FIXME: return
+    if isinstance(X, str):
+        return 'char'
+    return 'double'
+
 def _size(X, d=None):
     if isinstance(X, _marray):
         res = X.msize
+    elif _isscalar(X):
+        return (1, 1)
     else:
         from operator import isSequenceType
         shp = []

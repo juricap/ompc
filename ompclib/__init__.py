@@ -2,7 +2,7 @@
 # the default implementation at the moment is the ompc_numpy module 
 import ompclib_numpy
 from ompclib_numpy import *
-from ompclib_numpy import _ompc_base
+from ompclib_numpy import _ompc_base, _marray, _size, _dtype
 from ompc import _get_narginout
 from ompclib_platform import getch
 

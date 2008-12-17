@@ -3,7 +3,8 @@ import sys, os
 sys.path += [os.path.abspath('.'), os.path.abspath('..')]
 from ompcply import translate_to_str
 
-__all__ = ['mfunction', '_get_narginout', 'compile']
+__all__ = ['mfunction', '_get_narginout', 'compile', 'build_return']
+
 
 def mfunction_simple(names):
     def dec(func):
@@ -109,12 +110,16 @@ class mfunction:
         #        c.code[i] = (LOAD_FAST,x[1])
         
         postfix = []
-        for name in self._retvals:                
-            postfix += [(LOAD_FAST, name)]
         
-        postfix.extend([(BUILD_TUPLE, len(self._retvals)),
-                        (LOAD_FAST, 'nargout'),
-                        (SLICE_2, None),
+#         postfix.extend([(BUILD_TUPLE, len(self._retvals)),
+#                         (LOAD_FAST, 'nargout'),
+#                         (SLICE_2, None),
+#                         (RETURN_VALUE, None)])
+        postfix.extend([(LOAD_GLOBAL, 'build_return'),
+                        (LOAD_FAST, 'nargout')])
+        for name in self._retvals:                
+            postfix += [(LOAD_FAST, name)]    
+        postfix.extend([(CALL_FUNCTION, len(self._retvals)+1),
                         (RETURN_VALUE, None)])
         
         self._c.code.extend(postfix)
@@ -322,6 +327,16 @@ if not hasattr(__main__, '__OMPC'):
     
     install()
     __main__.__OMPC = True
+
+def build_return(nargout, *args):
+    from ompclib import _marray, _dtype, _size
+    ret = []
+    for x in args[:nargout]:
+        if isinstance(x, _marray): ret += [ x ]
+        else: ret += [ _marray(_dtype(x), _size(x), x) ]
+    if len(ret) == 1:
+        ret = ret[0]
+    return ret
 
 if __name__ == "__main__":
     pth = '../examples/mfiles/'
