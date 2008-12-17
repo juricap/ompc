@@ -53,3 +53,6 @@ ompc> [X, Y] = meshgrid(x, y)
 
 ompc> meshgrid(linspace(1,5,3), linspace(1,2,4))
 ans = meshgrid(linspace(1,5,3), linspace(1,2,4)); print ans
+
+ompc> A = [1 2 0; 2 5 -1; 4 10 -1]
+A = mcat([1, 2, 0, OMPCSEMI, 2, 5, -1, OMPCSEMI, 4, 10, -1])

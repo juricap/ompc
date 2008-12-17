@@ -22,7 +22,7 @@ from byteplay import Code, LOAD_GLOBAL, CALL_FUNCTION, \
                                    BINARY_MULTIPLY, BUILD_TUPLE, SLICE_2, \
                                    RETURN_VALUE
 
-def _get_narginout():
+def _get_narginout(nargout_default=1):
     """Return how many values the caller is expecting.
     """
     import sys, dis
@@ -45,7 +45,7 @@ def _get_narginout():
         return nargin, howmany
     elif instruction == dis.opmap['POP_TOP']:
         # MATLAB assumes at least 1 value
-        return nargin, 1
+        return nargin, nargout_default
     return nargin, 1
 
 class mfunction:
@@ -311,8 +311,24 @@ def addpath(*args):
     else:
         sys.path.insetr(pos, list(args))
 
+_tictoc_t0 = None
+from time import clock as _clock
+def tic():
+    global _tictoc_t0
+    _tictoc_t0 = _clock()
+
+def toc():
+    global _tictoc_t0
+    t1 = _clock() - _tictoc_t0
+    nargin, nargout = _get_narginout(0)
+    if nargout > 0:
+        return t1
+    print 'Elapsed time is %0.6f seconds.'%t1
+
 import __main__
 __main__.__dict__['addpath'] = addpath
+__main__.__dict__['tic'] = tic
+__main__.__dict__['toc'] = toc
 
 def install():
     """Install the import hook"""

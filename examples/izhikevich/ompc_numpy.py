@@ -1,6 +1,12 @@
 
 from ompclib_numpy import *
 
+try:
+    import psyco
+    psyco.full()
+except:
+    pass
+
 def main():
     import os, sys
     sys.argv = sys.argv[1:]

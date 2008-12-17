@@ -26,9 +26,11 @@ for t in mslice[1:1000]:# simulation of 1000 ms
         v(fired).lvalue = c(fired)
         u(fired).lvalue = u(fired) + d(fired)
         I = I + sum(S(mslice[:], fired), 2)
+    
     end
     v = v + 0.5 * (0.04 * v **elpow** 2 + 5 * v + 140 - u + I)
     v = v + 0.5 * (0.04 * v **elpow** 2 + 5 * v + 140 - u + I)
     u = u + a *elmul* (b *elmul* v - u)
+
 end
 plot(firings(mslice[:], 1), firings(mslice[:], 2), mstring('.'))

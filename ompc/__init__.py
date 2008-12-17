@@ -1,6 +1,6 @@
 
-import sys
-sys.path += ['..']
+import sys, os
+sys.path += [os.path.abspath('.'), os.path.abspath('..')]
 from ompcply import translate_to_str
 
 __all__ = ['mfunction', '_get_narginout', 'compile', 'addpath']
@@ -23,8 +23,10 @@ from byteplay import Code, LOAD_GLOBAL, CALL_FUNCTION, \
                                    BINARY_MULTIPLY, BUILD_TUPLE, SLICE_2, \
                                    RETURN_VALUE
 
-def _get_narginout():
+def _get_narginout(nargout_default=1):
     """Return how many values the caller is expecting.
+    `nargout_default` is the value returned if no return value is expected.
+    By default this is 1.
     """
     import sys, dis
     f = sys._getframe()
@@ -46,7 +48,7 @@ def _get_narginout():
         return nargin, howmany
     elif instruction == dis.opmap['POP_TOP']:
         # MATLAB assumes at least 1 value
-        return nargin, 1
+        return nargin, nargout_default
     return nargin, 1
 
 class mfunction:
@@ -297,24 +299,20 @@ class MFileLoader(ihooks.ModuleLoader):
             return ihooks.ModuleLoader.find_module_in_dir(
                 self, name, dir, allow_packages)
 
-def addpath(*args):
-    import sys
-    pos = None
-    last = args[-1]
-    if last.lower() in ['-begin', '-end', '-frozen']:
-        args = args[:-1]
-        if last.lower() == '-begin':
-            pos = 0
-        elif sys.platform.startswith('win') and last.lower() == '-frozen':
-            raise NotImplementedError()
-    if pos is None:
-        sys.path += list(args)
-    else:
-        sys.path.insetr(pos, list(args))
-
+# populate the __main__ namespace with OMPCbase functions
 import __main__
-__main__.__dict__['addpath'] = addpath
-        
+import ompclib
+
+_ns = __main__
+# IPython needs special treatment
+if hasattr(_ns, '__IP'):
+    _ns = _ns.__IP.user_ns
+else:
+    _ns = __main__.__dict__
+
+for x in ompclib.__ompc_all__:
+    _ns[x] = getattr(ompclib, x)
+
 def install():
     """Install the import hook"""
     ihooks.install(ihooks.ModuleImporter(MFileLoader(MFileHooks())))
