@@ -9,6 +9,8 @@ __author__ = 'juricap@gmail.com'
 __version__ = '1.0-beta'
 
 
+from distutils.sysconfig import get_python_lib; print 
+
 # The base package metadata to be used by both distutils and setuptools
 METADATA = dict(
   name = "OMPC",
@@ -23,7 +25,9 @@ METADATA = dict(
   package_dir={'':'.'},
   package_data={'ompceg': ['test.*'],
                 'ompc' : ['ompcply.test'],
-                '': ['licenses/ply/*', 'test.py']},
+                '': ['licenses/ply/*', 'test.py',
+                     'ompc.cfg', 'LICENSE', 'README']},
+  data_files=[(get_python_lib(), ['sandbox/ompc.pth'])],
 )
 
 def pysetup():
