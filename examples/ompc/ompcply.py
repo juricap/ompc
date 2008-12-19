@@ -648,56 +648,12 @@ def p_expression_binop(p):
                   | expression OR expression'''
     if p[2] == '+'  : p[0] = '%s + %s'%(p[1], p[3])
     elif p[2] == '-'  : p[0] = '%s - %s'%(p[1], p[3])
-    #elif p[2] == '*'  : p[0] = '%s * %s'%(p[1], p[3])
-    elif p[2] == '*'  : p[0] = 'dot(%s, %s)'%(p[1], p[3])
-    #elif p[2] == '/'  : p[0] = '%s / %s'%(p[1], p[3])
-    elif p[2] == '/'  : p[0] = 'linalg.solve(%s, %s)'%(p[1], p[3])
-    elif p[2] == '^'  : p[0] = '%s ** %s'%(p[1], p[3])
-    #elif p[2] == '.*'  : p[0] = '%s *elmul* %s'%(p[1], p[3])
-    elif p[2] == '.*'  : p[0] = '%s * %s'%(p[1], p[3])
-    #elif p[2] == './'  : p[0] = '%s /eldiv/ %s'%(p[1], p[3])
-    elif p[2] == './'  : p[0] = '%s / %s'%(p[1], p[3])
-    #elif p[2] == '.^'  : p[0] = '%s **elpow** %s'%(p[1], p[3])
-    elif p[2] == '.^'  : p[0] = '%s ** %s'%(p[1], p[3])
-    # conditional and logical
-    elif p[2] == '~='  : p[0] = '%s != %s'%(p[1], p[3])
-    elif p[2] == '=='  : p[0] = '%s == %s'%(p[1], p[3])
-    elif p[2] == '<'  : p[0] = '%s < %s'%(p[1], p[3])
-    elif p[2] == '>'  : p[0] = '%s > %s'%(p[1], p[3])
-    elif p[2] == '<='  : p[0] = '%s <= %s'%(p[1], p[3])
-    elif p[2] == '>='  : p[0] = '%s >= %s'%(p[1], p[3])
-    elif p[2] == '&'  : p[0] = 'logical_and(%s, %s)'%(p[1], p[3])
-    elif p[2] == '|'  : p[0] = 'logical_or(%s, %s)'%(p[1], p[3])
-    elif p[2] == '&&'  : p[0] = '%s and %s'%(p[1], p[3])
-    elif p[2] == '||'  : p[0] = '%s or %s'%(p[1], p[3])
-
-def p_expression_binop(p):
-    '''expression : expression '+' expression
-                  | expression '-' expression
-                  | expression '*' expression
-                  | expression '/' expression
-                  | expression '^' expression
-                  | expression DOTTIMES expression
-                  | expression DOTDIVIDE expression
-                  | expression DOTPOWER expression
-                  | expression NOTEQUAL expression
-                  | expression ISEQUAL expression
-                  | expression LESS expression
-                  | expression GREATER expression
-                  | expression LESSEQUAL expression
-                  | expression GREATEREQUAL expression
-                  | expression ELAND expression
-                  | expression ELOR expression
-                  | expression AND expression
-                  | expression OR expression'''
-    if p[2] == '+'  : p[0] = '%s + %s'%(p[1], p[3])
-    elif p[2] == '-'  : p[0] = '%s - %s'%(p[1], p[3])
     elif p[2] == '*'  : p[0] = '%s * %s'%(p[1], p[3])
     elif p[2] == '/'  : p[0] = '%s / %s'%(p[1], p[3])
-    elif p[2] == '^'  : p[0] = '%s ** %s'%(p[1], p[3]) 
-    elif p[2] == '.*'  : p[0] = '%s * %s'%(p[1], p[3])
-    elif p[2] == './'  : p[0] = '%s / %s'%(p[1], p[3])
-    elif p[2] == '.^'  : p[0] = '%s ** %s'%(p[1], p[3])
+    elif p[2] == '^'  : p[0] = '%s ** %s'%(p[1], p[3])
+    elif p[2] == '.*'  : p[0] = '%s *elmul* %s'%(p[1], p[3])
+    elif p[2] == './'  : p[0] = '%s /eldiv/ %s'%(p[1], p[3])
+    elif p[2] == '.^'  : p[0] = '%s **elpow** %s'%(p[1], p[3])
     # conditional and logical
     elif p[2] == '~='  : p[0] = '%s != %s'%(p[1], p[3])
     elif p[2] == '=='  : p[0] = '%s == %s'%(p[1], p[3])
