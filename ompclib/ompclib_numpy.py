@@ -38,6 +38,10 @@ _dtype2numpy = {'complex': 'complex128',
                 'bool': 'bool',
                }
 
+_numpy2dtype = {}
+for k, v in _dtype2numpy.items():
+    _numpy2dtype[np.dtype(v)] = k
+
 # errors and warnings
 
 class OMPCException(Exception):
@@ -85,6 +89,10 @@ class mvar(object):
     def __deepcopy__(self):
         return _marray(self.dtype, self.msize, self._a.copy())
     
+    def __base0__(self, shp=None):
+        raise OMPCException(
+                'Class "%s" cannot be used as index!'%self.__class__)
+    
     # FIXME: warn people about using numpy functions directly
 #     def __array__(self):
 #         print repr(self)
@@ -121,9 +129,17 @@ class _el:
     def __rmul__(self, left):
         if self.right is None: return _el(left=left)
         return left.__elmul__(self.right)
+    
+    def __div__(self, right):
+        if self.left is None: return _el(right=right)
+        return self.left.__eldiv__(right)
+    def __rdiv__(self, left):
+        if self.right is None: return _el(left=left)
+        return left.__eldiv__(self.right)
 
 elpow = _el()
 elmul = _el()
+eldiv = _el()
 
 def _dsize(dtype):
     return _dsize_dict[dtype]
@@ -259,12 +275,225 @@ def _ndshape1(msize, *i):
 def isempty(A):
     return np.prod(A.msize) == 0
 
-def _dot(A, B):
-    if not isinstance(A, _marray) or not isinstance(B, _marray):
-        raise NotImplementedError("arguments must be 'marray's.")
-    # FIXME: wrong dtype, needs to be the higher one
-    na = np.dot(B._a, A._a)
-    return _marray('double', na.shape[::-1], na)
+###################### base mfunctions
+
+@_ompc_base
+def plus(A, B):
+    if isinstance(A, mvar): A = A._a
+    if isinstance(B, mvar): B = B._a
+    na = A+B
+    return _marray(_numpy2dtype[na.dtype], na.shape[::-1], na)
+
+@_ompc_base
+def minus(A, B):
+    if isinstance(A, mvar): A = A._a
+    if isinstance(B, mvar): B = B._a
+    na = A-B
+    return _marray(_numpy2dtype[na.dtype], na.shape[::-1], na)
+
+@_ompc_base
+def uminus(A):
+    if isinstance(A, mvar): A = A._a
+    na = -A
+    return _marray(_numpy2dtype[na.dtype], na.shape[::-1], na)
+
+@_ompc_base
+def times(A, B):
+    if isinstance(A, mvar): A = A._a
+    if isinstance(B, mvar): B = B._a
+    na = A*B
+    return _marray(_numpy2dtype[na.dtype], na.shape[::-1], na)
+
+@_ompc_base
+def mtimes(A, B):
+    if isinstance(A, mvar): A = A._a
+    if isinstance(B, mvar): B = B._a
+    # the arrays are stored transposed
+    na = np.dot(B, A)
+    return _marray(_numpy2dtype[na.dtype], na.shape[::-1], na)
+
+@_ompc_base
+def mdiv(A, B):
+    raise NotImplementedError()
+
+@_ompc_base
+def power(A, B):
+    if isinstance(A, mvar): A = A._a
+    if isinstance(B, mvar): B = B._a
+    na = A**B
+    return _marray(_numpy2dtype[na.dtype], na.shape[::-1], na)
+
+from numpy.linalg import matrix_power
+@_ompc_base
+def mpower(A, B):
+    if len(A.msize) != 2:
+        raise OMPCException('??? Error using ==> mpower\n'
+                            'marray must be 2-D')
+    if isinstance(A, mvar): A = A._a
+    if isinstance(B, mvar): B = B._a
+    if isinstance(B, float):
+        if np.around(him) != him: raise NotImplementedError()
+        else: B = int(B)
+    na = matrix_power(A.T, B)
+    return _marray(_numpy2dtype[na.dtype], na.shape[::-1], na)
+
+@_ompc_base
+def eq(A, B):
+    if isinstance(A, mvar): A = A._a
+    if isinstance(B, mvar): B = B._a
+    na = A == B
+    return _marray('bool', na.shape[::-1], na)
+
+@_ompc_base
+def ne(A, B):
+    if isinstance(A, mvar): A = A._a
+    if isinstance(B, mvar): B = B._a
+    na = A != B
+    return _marray('bool', na.shape[::-1], na)
+
+@_ompc_base
+def lt(A, B):
+    if isinstance(A, mvar): A = A._a
+    if isinstance(B, mvar): B = B._a
+    na = A < B
+    return _marray('bool', na.shape[::-1], na)
+
+@_ompc_base
+def gt(A, B):
+    if isinstance(A, mvar): A = A._a
+    if isinstance(B, mvar): B = B._a
+    na = A > B
+    return _marray('bool', na.shape[::-1], na)
+
+@_ompc_base
+def le(A, B):
+    if isinstance(A, mvar): A = A._a
+    if isinstance(B, mvar): B = B._a
+    na = A <= B
+    return _marray('bool', na.shape[::-1], na)
+
+@_ompc_base
+def ge(A, B):
+    if isinstance(A, mvar): A = A._a
+    if isinstance(B, mvar): B = B._a
+    na = A >= B
+    return _marray('bool', na.shape[::-1], na)
+
+@_ompc_base
+def and_(A, B):
+    '''Element-wise logical AND.'''
+    if isinstance(A, mvar): A = A._a
+    if isinstance(B, mvar): B = B._a
+    na = np.logical_and(A, B)
+    return _marray('bool', na.shape[::-1], na)
+
+@_ompc_base
+def or_(A, B):
+    '''Element-wise logical OR.'''
+    if isinstance(A, mvar): A = A._a
+    if isinstance(B, mvar): B = B._a
+    na = np.logical_or(A, B)
+    return _marray('bool', na.shape[::-1], na)
+
+@_ompc_base
+def not_(A):
+    '''Logical NOT.'''
+    if isinstance(A, mvar): A = A._a
+    na = np.logical_not(A)
+    return _marray('bool', na.shape[::-1], na)
+
+@_ompc_base
+def xor_(A, B):
+    '''Logical XOR.'''
+    if isinstance(A, mvar): A = A._a
+    if isinstance(B, mvar): B = B._a
+    na = np.logical_xor(A, B)
+    return _marray('bool', na.shape[::-1], na)
+
+@_ompc_base
+def any(A):
+    '''True if any element of vector is nonzero'''
+    if isinstance(A, mvar): A = A._a
+    return bool(np.any(A))
+
+@_ompc_base
+def all(A):
+    '''True if all elements of vector is nonzero'''
+    if isinstance(A, mvar): A = A._a
+    return bool(np.all(A))
+
+def transpose(A):
+    '''Transpose.'''
+    if len(A.msize) != 2:
+        raise OMPCException('Transpose on ND array is not defined.')
+    return _marray(A.dtype, A.msize[::-1], A._a.T.copy())
+
+def ctranspose(A):
+    '''Complex conjugate transpose.'''
+    if len(A.msize) != 2:
+        raise OMPCException('Transpose on ND array is not defined.')
+    return _marray(A.dtype, A.msize[::-1], A._a.conj().T.copy())
+
+def horzcat(*X):
+    '''Horizontal concatenation.'''
+    # our _a member is transposed do vertcat
+    X = [ isinstance(x, mvar) and x or x._a for x in X ]
+    na = np.vstack(X)
+    return _marray(_numpy2dtype[na.dtype], na.shape[::-1], na)
+
+def vertcat(*X):
+    '''Vertical concatenation.'''
+    # our _a member is transposed do horztcat
+    X = [ isinstance(x, mvar) and x or x._a for x in X ]
+    na = np.hstack(X)
+    return _marray(_numpy2dtype[na.dtype], na.shape[::-1], na)
+
+# FIXME bit operations
+
+
+def union(A, B, flag=None):
+    '''Set union.'''
+    # FIXME support nargout = 3
+    if isinstance(A, mvar): A = A._a
+    if isinstance(B, mvar): B = B._a
+    if flag.lower() == 'rows':
+        if A.ndim != 2 or B.ndim != 2:
+            raise OMPCException('A nd B must 2D matrices!')
+        if A.shape[0] != B.shape[0]:
+            raise OMPCException('A nd B must have same number of columns!')
+        # FIXME: slow and memory hungry
+        sA = set( tuple(x) for x in A )
+        na = np.array([ x for x in sA.union( tuple(x) for x in b._a.T ) ]).T
+    else:
+        # must be vectors
+        if A.shape[0] == 1 or A.shape[1] == 1: A = A.reshape(-1)
+        else: raise OMPCException('A nd B must vectors or 2D matrices!')
+        if B.shape[0] == 1 or B.shape[1] == 1: B = B.reshape(-1)
+        else: raise OMPCException('A nd B must vectors or 2D matrices!')
+        na = np.union1d(A, B).reshape(-1,1)
+    return _marray(_numpy2dtype[na.dtype], na.shape[::-1], na)
+
+def unique(A, B):
+    '''Set unique.'''
+    raise NotImplementedError()
+
+def intersect(A, B):
+    '''Set intersection.'''
+    raise NotImplementedError()
+
+def setdiff(A, B):
+    '''Set difference.'''
+    raise NotImplementedError()
+
+def setxor(A, B):
+    '''Set exclusive-or.'''
+    raise NotImplementedError()
+
+def ismember(A, B):
+    '''True for set member.'''
+    raise NotImplementedError()
+
+############ support functions
 
 def _squeeze(A):
     res = A.__copy__()
@@ -381,63 +610,71 @@ class _marray(mvar):
         return _marray(self.dtype, self.msize, self._a.copy())
     
     # operators
+    def __pow__(self, right):
+        # if multiplying with _el object, call the elementwise operation
+        if isinstance(right, _el):
+            if right.right is not None: return power(self, right.right)
+            else: return _el(left=self)
+        elif _isscalar(right): return power(self, right)
+        return mpower(self, right)
+    def __rpow__(self, left):
+        # if multiplying with _el object, call the elementwise operation
+        if isinstance(left, _el):
+            if left.left is not None: return power(left.left, self)
+            else: return _el(right=self)
+        elif _isscalar(left): return power(left, self)
+        return mpower(left, self)
     def __elpow__(self, him):
-        if isinstance(him, _marray): him = him._a
-        return _marray(self.dtype, self.msize, self._a**him)
+        return power(self._a, him)
     
     def __elmul__(self, him):
-        if isinstance(him, _marray): him = him._a
-        return _marray(self.dtype, self.msize, self._a*him)
-    
+        return times(self, him)
     def __mul__(self, right):   
-        if len(self.msize) != 2:
-            # FIXME
-            raise OMPCError('??? Error using ==> mtimes\n'
-                            'Input arguments must be 2-D')
         # if multiplying with _el object, call the elementwise operation
-        if isinstance(right, _el): return _el(left=self)
-        elif _isscalar(right): return self.__elmul__(right)
-        # matrix multiplication
-        return _dot(self, right)
-    
+        if isinstance(right, _el):
+            if right.right is not None: return times(self, right.right)
+            else: return _el(left=self)
+        elif _isscalar(right): return times(self, right)
+        return mtimes(self, right)
     def __rmul__(self, left):
         # if multiplying with _el object, call the elementwise operation
-        if isinstance(left, _el): return _el(right=self)
-        elif _isscalar(left): return self.__elmul__(left)
-        # matrix multiplication
-        return _dot(left, self)
+        if isinstance(left, _el):
+            if left.left is not None: return times(left.left, self)
+            else: return _el(right=self)
+        elif _isscalar(left): return times(left, self)
+        return mtimes(left, self)
     
-    def __add__(self, him):
-        if isinstance(him, _marray): him = him._a
-        na = self._a + him
-        return _marray(self.dtype, na.shape[::-1], na)
-    __radd__ = __add__
+    def __eldiv__(self, him):
+        return ldivide(self, him)
+    def __div__(self, right):
+        # if multiplying with _el object, call the elementwise operation
+        if isinstance(right, _el):
+            if right.right is not None: return ldivide(self, right.right)
+            else: return _el(left=self)
+        elif _isscalar(right): return ldivide(self, right)
+        return mldivide(self, right)
+    def __rdiv__(self, left):
+        # if multiplying with _el object, call the elementwise operation
+        if isinstance(left, _el):
+            if left.left is not None: return ldivide(left.left, self)
+            else: return _el(right=self)
+        elif _isscalar(left): return ldivide(left, self)
+        return mldivide(left, self)
     
-    def __sub__(self, him):
-        if isinstance(him, _marray): him = him._a
-        na = self._a-him
-        return _marray(self.dtype, na.shape[::-1], na)
-    def __rsub__(self, him):
-        if isinstance(him, _marray): him = him._a
-        na = him - self._a
-        return _marray(self.dtype, na.shape[::-1], na)
+    def __elrdiv__(self, him):
+        return rdivide(self, him)
     
-    def __div__(self, him):
-        if isinstance(him, _marray): him = him._a
-        na = self._a / him
-        return _marray(self.dtype, na.shape[::-1], na)
-    def __rdiv__(self, him):
-        if isinstance(him, _marray): him = him._a
-        na = self._a + him / self._a
-        return _marray(self.dtype, na.shape[::-1], na)
+    def __add__(self, him): return plus(self, him)
+    def __radd__(self, him): return plus(him, self)
     
-    def __neg__(self):
-        return _marray(self.dtype, self.msize, -self._a)
+    def __sub__(self, him): return minus(self, him)
+    def __rsub__(self, him): return minus(him, self)
+    
+    def __neg__(self): return uminus(self)
     
     # comparisons
-    def __ge__(self, other):
-        if isinstance(other, _marray): other = other._a
-        return _marray('bool', self.msize, self._a >= other)
+    def __ge__(self, other): return ge(self, other)
+
     def __gt__(self, other):
         if isinstance(other, _marray): other = other._a
         return _marray('bool', self.msize, self._a > other)
@@ -463,6 +700,14 @@ class _marray(mvar):
     def __len__(self):
         return max(self.msize)
     
+    def __base0__(self, shp=None):
+        if self.dtype == 'bool':
+            return self._a
+        ind = (self._a - 1).T.astype('i4')
+        if ind.ndim == 2 and ind.shape[0] == 1:
+            ind = ind[0]
+        return ind
+    
     def __getitem__(self, i):
         # determine the size of the new array
         #if not hasattr(i, '__len__'): i = [i]
@@ -482,12 +727,13 @@ class _marray(mvar):
             if self.msize[0] == 1: ri = (i[0]._a.astype('i4').reshape(-1)-1, 0)
             elif self.msize[1] == 1: ri = (0, i[0]._a.astype('i4').reshape(-1)-1)
             else:
+                # access to a flat array
+                self._a.flat
                 raise NotImplementedError()
         else:
             di = len(self.msize)-1
             for x in reversed(i):
-                if isinstance(x, _marray): ri.append(x._a.astype('i4').reshape(-1)-1)
-                elif isinstance(x, _mslice): ri.append(x.__base0__(self.msize[di]))
+                if isinstance(x, mvar): ri.append(x.__base0__(self.msize[di]))
                 else: ri.append(x-1)
                 di -= 1
         na = self._a.__getitem__(tuple(ri))
@@ -515,21 +761,16 @@ class _marray(mvar):
         else:
             di = len(self.msize)-1
             for x in reversed(i):
-                if isinstance(x, _marray): ri.append(x._a.astype('i4').reshape(-1)-1)
-                elif isinstance(x, _mslice): ri.append(x.__base0__(self.msize[di]))
+                if isinstance(x, mvar): ri.append(x.__base0__(self.msize[di]))
                 else: ri.append(x-1)
                 di -= 1
         self._a.__setitem__(tuple(ri), val)
     
     # properties
     def transposed(self):
-        assert len(self.msize) == 2
-        return _marray(self.dtype, self.msize[::-1], 
-                        self._a.T.reshape(self.msize).copy())
+        return transpose(self)
     def ctransposed(self):
-        assert len(self.msize) == 2
-        return _marray(self.dtype, self.msize[::-1], 
-                        self._a.conj().T.reshape(self.msize).copy())
+        return ctranspose(self)
     T = property(transposed, None, None, "Transpose.")
     cT = property(transposed, None, None, "Conjugate transpose.")
     
@@ -614,9 +855,14 @@ class _mslice(mvar):
     
     def __iter__(self):
         value = self.start
-        while value <= self.stop:
-            yield float(value)
-            value += self.step
+        if self.step < 0:
+            while value >= self.stop:
+                yield float(value)
+                value += self.step
+        else:
+            while value <= self.stop:
+                yield float(value)
+                value += self.step
     
     def __getitem__(self, i):
         self.init_data()
@@ -713,8 +959,11 @@ class _mslice_helper:
                 raise IndexError(
                     'Use 2- and 3-slices only. Use "end" instead of "None".')
             else: stop = i.stop
+        # there are all 3 arguments, stop is actually i.step
+        elif i.stop < 0:
+            stop = i.step
+            step = i.stop
         else:
-            # there are all 3 arguments, stop is actually i.step
             # 1:2:10 -> slice(1,2,10) -> mslice(1,10,2)
             stop = i.step
             step = i.stop
@@ -880,13 +1129,13 @@ def randn(*args):
 @_ompc_base
 def reshape(A, *newsize):
     if len(newsize) == 0:
-        raise OMPCError('??? Error using ==> reshape\n'
+        raise OMPCException('??? Error using ==> reshape\n'
                         'Not enough input arguments.')
     if len(newsize) == 1 and hasattr(newsize, '__len__'):
         newsize = newsize[0]
     
     if not np.prod(A.msize) == np.prod(newsize):
-        raise OMPCError('??? Error using ==> reshape\n'
+        raise OMPCException('??? Error using ==> reshape\n'
                         'To RESHAPE the number of elements must not change.')
     out = A.__copy__()
     out.msize = newsize
@@ -996,6 +1245,35 @@ def round(X):
     return _marray('double', X.msize, np.around(X._a))
 
 @_ompc_base
+def floor(X):
+    return _marray('double', X.msize, np.floor(X._a))
+
+@_ompc_base
+def ceil(X):
+    return _marray('double', X.msize, np.ceil(X._a))
+
+@_ompc_base
+def fix(X):
+    return _marray('double', X.msize, np.fix(X._a))
+
+@_ompc_base
+def mod(X,i):
+    dtype, msize = X.dtype, X.msize
+    if isinstance(X, mvar): X = X._a
+    if isinstance(i, mvar):
+        if i.msize != msize:
+            raise OMPCException("Matrix dimensions must agree!")
+        i = i._a
+    if i == 0:
+        return _marray(dtype, msize, X)
+    elif np.all(X == i):
+        print '3'
+        return zeros(X.msize, X.dtype)
+    na = np.mod(X, i)
+    print na, i, X
+    return _marray(_numpy2dtype[na.dtype], msize, na)
+
+@_ompc_base
 def sqrt(X):
     if _isscalar(X):
         X = _marray('double', (1,1), [X])
@@ -1004,39 +1282,41 @@ def sqrt(X):
     else:
         return _marray('double', X.msize, np.sqrt(X._a))
 
+@_ompc_base
 def magic(n):
     # from Octave's magic.m
+    A = empty((n, n), 'double')
     if n == 0:
         return marray([])
     elif mod (n, 2) == 1:
-        shift = floor ((m_[0:n*n-1])/n)
-        c = mod (m_[1:n*n] - shift + (n-3)/2, n)
-        r = mod (m_[n*n:-1:1] + 2*shift, n)
-        A(c*n+r+1).lvalue = m_[1:n*n]
+        import ompc
+        n = 3
+        shift = floor ((mslice[0:n*n-1])/n)
+        c = mod(mslice[1:n*n] - shift + (n-3)/2, n)
+        r = mod(mslice[n*n:-1:1] + 2*shift, n)
+        A(c*n+r+1).lvalue = mslice[1:n*n]
         A = reshape(A, n, n);
-#     elif mod(n, 4) == 0:
-#         A = reshape(r_[1:n*n+1], n, n).T;
-#         I = [1:4:n, 4:4:n];
-#         I = r_[1:n+1:4, 4:n+1:4]
-#         J = fliplr (I);
-#         A(I,I) = A(J,J);
-#         I = [2:4:n, 3:4:n];
-#         J = fliplr (I);
-#         A(I,I) = A(J,J);
-#     elif mod(n, 4) == 2:
-#         m = n/2;
-#         A = magic (m);
-#         A = [A, A+2*m*m; A+3*m*m, A+m*m];
-#         k = (m-1)/2;
-#         if (k>1)
-#           I = 1:m;
-#           J = [2:k, n-k+2:n];
-#           A([I,I+m],J) = A([I+m,I],J);
-#         endif
-#         I = [1:k, k+2:m];
-#         A([I,I+m],1) = A([I+m,I],1);
-#         I = k + 1;
-#         A([I,I+m],I) = A([I+m,I],I);
+    elif mod(n, 4) == 0:
+        A = reshape(mslice[1:n*n], n, n).cT;
+        I = mcat([mslice[1:4:n], mslice[4:4:n]])
+        J = fliplr(I);
+        A(I,I).lvalue = A(J,J)
+        I = mcat([mslice[2:4:n], mslice[3:4:n]]);
+        J = fliplr(I);
+        A(I,I).lvalue = A(J,J);
+    elif mod(n, 4) == 2:
+        m = n/2
+        A = magic(m)
+        A = mcat([A, A+2*m*m, OMPCSEMI, A+3*m*m, A+m*m])
+        k = (m-1)/2
+        if k > 1:
+            I = mslice[1:m]
+            J = mcat([mslice[2:k], mslice[n-k+2:n]])
+            A([I,I+m],J).lvalue = A([I+m,I],J)
+        I = mcat([mslice[1:k], mslic[k+2:m]])
+        A([I,I+m],1).lvalue = A([I+m,I],1);
+        I = k + 1
+        A([I,I+m],I).lvalue = A([I+m,I],I)
     return A
 
 class mhandle(_marray):

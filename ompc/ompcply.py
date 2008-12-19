@@ -36,7 +36,7 @@ if OCTAVE:
 tokens = [
     'NAME', 'NUMBER', 'STRING',
     'COMMA', 'SEMICOLON', 'NEWLINE',
-    'DOTTIMES', 'DOTDIVIDE', 'DOTPOWER',
+    'DOTTIMES', 'DOTDIVIDE', 'DOTPOWER', 'DOTRDIVIDE',
     'NOTEQUAL', 'ISEQUAL', 'TRANS', 'CONJTRANS',
     'LESS', 'GREATER', 'LESSEQUAL', 'GREATEREQUAL',
     'AND', 'OR', 'NOT', 'ELOR', 'ELAND',
@@ -45,7 +45,7 @@ tokens = [
     'COMMENT',
     ] + reserved.values()
 
-literals = ['=', '+', '-', '*', '/', '^', ':', "'", '.']
+literals = ['=', '+', '-', '*', '/', '\\', '^', ':', "'", '.']
 
 states = (
     ('comment', 'exclusive'),
@@ -126,6 +126,7 @@ def t_comment_error(t):
 
 t_DOTTIMES = r'\.\*'
 t_DOTDIVIDE = r'\./'
+t_DOTRDIVIDE = r'\.\\'
 t_DOTPOWER = r'\.\^'
 t_NOTEQUAL = r'~='
 t_ISEQUAL = r'=='
@@ -628,13 +629,15 @@ def p_expr_inlist_2(p):
     p[0] = p[1]
 
 def p_expression_binop(p):
-    '''expression : expression '+' expression
+    """expression : expression '+' expression
                   | expression '-' expression
                   | expression '*' expression
                   | expression '/' expression
+                  | expression '\\\\' expression
                   | expression '^' expression
                   | expression DOTTIMES expression
                   | expression DOTDIVIDE expression
+                  | expression DOTRDIVIDE expression
                   | expression DOTPOWER expression
                   | expression NOTEQUAL expression
                   | expression ISEQUAL expression
@@ -645,70 +648,28 @@ def p_expression_binop(p):
                   | expression ELAND expression
                   | expression ELOR expression
                   | expression AND expression
-                  | expression OR expression'''
-    if p[2] == '+'  : p[0] = '%s + %s'%(p[1], p[3])
-    elif p[2] == '-'  : p[0] = '%s - %s'%(p[1], p[3])
-    #elif p[2] == '*'  : p[0] = '%s * %s'%(p[1], p[3])
-    elif p[2] == '*'  : p[0] = 'dot(%s, %s)'%(p[1], p[3])
-    #elif p[2] == '/'  : p[0] = '%s / %s'%(p[1], p[3])
-    elif p[2] == '/'  : p[0] = 'linalg.solve(%s, %s)'%(p[1], p[3])
-    elif p[2] == '^'  : p[0] = '%s ** %s'%(p[1], p[3])
-    #elif p[2] == '.*'  : p[0] = '%s *elmul* %s'%(p[1], p[3])
-    elif p[2] == '.*'  : p[0] = '%s * %s'%(p[1], p[3])
-    #elif p[2] == './'  : p[0] = '%s /eldiv/ %s'%(p[1], p[3])
-    elif p[2] == './'  : p[0] = '%s / %s'%(p[1], p[3])
-    #elif p[2] == '.^'  : p[0] = '%s **elpow** %s'%(p[1], p[3])
-    elif p[2] == '.^'  : p[0] = '%s ** %s'%(p[1], p[3])
-    # conditional and logical
-    elif p[2] == '~='  : p[0] = '%s != %s'%(p[1], p[3])
-    elif p[2] == '=='  : p[0] = '%s == %s'%(p[1], p[3])
-    elif p[2] == '<'  : p[0] = '%s < %s'%(p[1], p[3])
-    elif p[2] == '>'  : p[0] = '%s > %s'%(p[1], p[3])
-    elif p[2] == '<='  : p[0] = '%s <= %s'%(p[1], p[3])
-    elif p[2] == '>='  : p[0] = '%s >= %s'%(p[1], p[3])
-    elif p[2] == '&'  : p[0] = 'logical_and(%s, %s)'%(p[1], p[3])
-    elif p[2] == '|'  : p[0] = 'logical_or(%s, %s)'%(p[1], p[3])
-    elif p[2] == '&&'  : p[0] = '%s and %s'%(p[1], p[3])
-    elif p[2] == '||'  : p[0] = '%s or %s'%(p[1], p[3])
-
-def p_expression_binop(p):
-    '''expression : expression '+' expression
-                  | expression '-' expression
-                  | expression '*' expression
-                  | expression '/' expression
-                  | expression '^' expression
-                  | expression DOTTIMES expression
-                  | expression DOTDIVIDE expression
-                  | expression DOTPOWER expression
-                  | expression NOTEQUAL expression
-                  | expression ISEQUAL expression
-                  | expression LESS expression
-                  | expression GREATER expression
-                  | expression LESSEQUAL expression
-                  | expression GREATEREQUAL expression
-                  | expression ELAND expression
-                  | expression ELOR expression
-                  | expression AND expression
-                  | expression OR expression'''
+                  | expression OR expression"""
     if p[2] == '+'  : p[0] = '%s + %s'%(p[1], p[3])
     elif p[2] == '-'  : p[0] = '%s - %s'%(p[1], p[3])
     elif p[2] == '*'  : p[0] = '%s * %s'%(p[1], p[3])
     elif p[2] == '/'  : p[0] = '%s / %s'%(p[1], p[3])
-    elif p[2] == '^'  : p[0] = '%s ** %s'%(p[1], p[3]) 
-    elif p[2] == '.*'  : p[0] = '%s * %s'%(p[1], p[3])
-    elif p[2] == './'  : p[0] = '%s / %s'%(p[1], p[3])
-    elif p[2] == '.^'  : p[0] = '%s ** %s'%(p[1], p[3])
+    elif p[2] == '\\' : p[0] = '%s /solve/ %s'%(p[1], p[3])
+    elif p[2] == '^'  : p[0] = '%s ** %s'%(p[1], p[3])
+    elif p[2] == '.*' : p[0] = '%s *elmul* %s'%(p[1], p[3])
+    elif p[2] == './' : p[0] = '%s /eldiv/ %s'%(p[1], p[3])
+    elif p[2] == '.\\': p[0] = '%s /elrdiv/ %s'%(p[1], p[3])
+    elif p[2] == '.^' : p[0] = '%s **elpow** %s'%(p[1], p[3])
     # conditional and logical
-    elif p[2] == '~='  : p[0] = '%s != %s'%(p[1], p[3])
-    elif p[2] == '=='  : p[0] = '%s == %s'%(p[1], p[3])
+    elif p[2] == '~=' : p[0] = '%s != %s'%(p[1], p[3])
+    elif p[2] == '==' : p[0] = '%s == %s'%(p[1], p[3])
     elif p[2] == '<'  : p[0] = '%s < %s'%(p[1], p[3])
     elif p[2] == '>'  : p[0] = '%s > %s'%(p[1], p[3])
-    elif p[2] == '<='  : p[0] = '%s <= %s'%(p[1], p[3])
-    elif p[2] == '>='  : p[0] = '%s >= %s'%(p[1], p[3])
+    elif p[2] == '<=' : p[0] = '%s <= %s'%(p[1], p[3])
+    elif p[2] == '>=' : p[0] = '%s >= %s'%(p[1], p[3])
     elif p[2] == '&'  : p[0] = 'logical_and(%s, %s)'%(p[1], p[3])
     elif p[2] == '|'  : p[0] = 'logical_or(%s, %s)'%(p[1], p[3])
-    elif p[2] == '&&'  : p[0] = '%s and %s'%(p[1], p[3])
-    elif p[2] == '||'  : p[0] = '%s or %s'%(p[1], p[3])
+    elif p[2] == '&&' : p[0] = '%s and %s'%(p[1], p[3])
+    elif p[2] == '||' : p[0] = '%s or %s'%(p[1], p[3])
 
 def p_expression_not(p):
     "expression : NOT expression"
