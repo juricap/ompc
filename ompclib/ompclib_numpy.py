@@ -11,6 +11,7 @@ import sys, os; sys.path.append(os.path.abspath('..'))
 
 from itertools import izip as _izip, cycle as _cycle, repeat as _repeat
 from ompc import _get_narginout
+import os, sys
 import numpy as np
 import pylab as mpl
 
@@ -110,36 +111,6 @@ class _mview(mvar):
         return "_mview(%r, %r, %r)"%(self.viewed, self.ins, self.linear)
     def __str__(self):
         return "<view of %r>"%(self.viewed)
-
-class _el:
-    def __init__(self, left=None, right=None):
-        self.left = left
-        self.right = right
-    
-    def __pow__(self, right):
-        if self.left is None: return _el(right=right)
-        return self.left.__elpow__(right)
-    def __rpow__(self, left):
-        if self.right is None: return _el(left=left)
-        return left.__elpow__(self.right)
-    
-    def __mul__(self, right):
-        if self.left is None: return _el(right=right)
-        return self.left.__elmul__(right)
-    def __rmul__(self, left):
-        if self.right is None: return _el(left=left)
-        return left.__elmul__(self.right)
-    
-    def __div__(self, right):
-        if self.left is None: return _el(right=right)
-        return self.left.__eldiv__(right)
-    def __rdiv__(self, left):
-        if self.right is None: return _el(left=left)
-        return left.__eldiv__(self.right)
-
-elpow = _el()
-elmul = _el()
-eldiv = _el()
 
 def _dsize(dtype):
     return _dsize_dict[dtype]
@@ -313,10 +284,6 @@ def mtimes(A, B):
     return _marray(_numpy2dtype[na.dtype], na.shape[::-1], na)
 
 @_ompc_base
-def mdiv(A, B):
-    raise NotImplementedError()
-
-@_ompc_base
 def power(A, B):
     if isinstance(A, mvar): A = A._a
     if isinstance(B, mvar): B = B._a
@@ -335,6 +302,25 @@ def mpower(A, B):
         if np.around(him) != him: raise NotImplementedError()
         else: B = int(B)
     na = matrix_power(A.T, B)
+    return _marray(_numpy2dtype[na.dtype], na.shape[::-1], na)
+
+@_ompc_base
+def mldivide(A, B):
+    raise NotImplementedError()
+
+@_ompc_base
+def mrdivide(A, B):
+    raise NotImplementedError()
+
+@_ompc_base
+def ldivide(A, B):
+    raise NotImplementedError()
+
+@_ompc_base
+def rdivide(A, B):
+    if isinstance(A, mvar): A = A._a
+    if isinstance(B, mvar): B = B._a
+    na = A / B
     return _marray(_numpy2dtype[na.dtype], na.shape[::-1], na)
 
 @_ompc_base
@@ -493,6 +479,39 @@ def ismember(A, B):
     '''True for set member.'''
     raise NotImplementedError()
 
+############ operators
+
+class _el(object):
+    def __new__(cls, left=None, right=None):
+        if left is None or right is None:
+            nel = super(_el, cls).__new__(_el)
+            nel.__class__ = cls
+            nel.left = left
+            nel.right = right
+            return nel
+        else:
+            return cls.op(left, right)
+
+def make_operator(name, method):
+    class _op(_el):
+        op = staticmethod(method)
+    def op(self, right):
+        if self.left is None: return self.__class__(right=right)
+        return self.op(self.left, right)
+    def rop(self, left):
+        if self.right is None: return self.__class__(left=left)
+        return self.op(left, self.right)
+    _op.__name__ = '_el%s'%name
+    setattr(_op, '__%s__'%name, op)
+    setattr(_op, '__r%s__'%name, rop)
+    return _op()
+
+elmul = make_operator('mul', times)
+elpow = make_operator('pow', power)
+eldiv = make_operator('div', rdivide)
+ldiv = make_operator('div', mldivide)
+elldiv = make_operator('div', ldivide)
+
 ############ support functions
 
 def _squeeze(A):
@@ -610,59 +629,42 @@ class _marray(mvar):
         return _marray(self.dtype, self.msize, self._a.copy())
     
     # operators
+    def __elpow__(self, him):
+        return power(self, him)
     def __pow__(self, right):
         # if multiplying with _el object, call the elementwise operation
-        if isinstance(right, _el):
-            if right.right is not None: return power(self, right.right)
-            else: return _el(left=self)
+        if isinstance(right, _el): return right.__class__(self, right.right)
         elif _isscalar(right): return power(self, right)
         return mpower(self, right)
     def __rpow__(self, left):
         # if multiplying with _el object, call the elementwise operation
-        if isinstance(left, _el):
-            if left.left is not None: return power(left.left, self)
-            else: return _el(right=self)
+        if isinstance(left, _el): return left.__class__(left.left, self)
         elif _isscalar(left): return power(left, self)
         return mpower(left, self)
-    def __elpow__(self, him):
-        return power(self._a, him)
     
     def __elmul__(self, him):
         return times(self, him)
-    def __mul__(self, right):   
-        # if multiplying with _el object, call the elementwise operation
-        if isinstance(right, _el):
-            if right.right is not None: return times(self, right.right)
-            else: return _el(left=self)
+    def __mul__(self, right):
+        if isinstance(right, _el): return right.__class__(self, right.right)
         elif _isscalar(right): return times(self, right)
         return mtimes(self, right)
     def __rmul__(self, left):
-        # if multiplying with _el object, call the elementwise operation
-        if isinstance(left, _el):
-            if left.left is not None: return times(left.left, self)
-            else: return _el(right=self)
+        if isinstance(left, _el): return left.__class__(left.left, self)
         elif _isscalar(left): return times(left, self)
         return mtimes(left, self)
     
     def __eldiv__(self, him):
-        return ldivide(self, him)
+        return rdivide(self, him)
     def __div__(self, right):
         # if multiplying with _el object, call the elementwise operation
-        if isinstance(right, _el):
-            if right.right is not None: return ldivide(self, right.right)
-            else: return _el(left=self)
-        elif _isscalar(right): return ldivide(self, right)
-        return mldivide(self, right)
+        if isinstance(right, _el): right.__class__(self, right.right)
+        elif _isscalar(right): return rdivide(self, right)
+        return mrdivide(self, right)
     def __rdiv__(self, left):
         # if multiplying with _el object, call the elementwise operation
-        if isinstance(left, _el):
-            if left.left is not None: return ldivide(left.left, self)
-            else: return _el(right=self)
-        elif _isscalar(left): return ldivide(left, self)
-        return mldivide(left, self)
-    
-    def __elrdiv__(self, him):
-        return rdivide(self, him)
+        if isinstance(left, _el): return left.__class__(left.left, self)
+        elif _isscalar(left): return rdivide(left, self)
+        return mrdivide(left, self)
     
     def __add__(self, him): return plus(self, him)
     def __radd__(self, him): return plus(him, self)
@@ -701,6 +703,7 @@ class _marray(mvar):
         return max(self.msize)
     
     def __base0__(self, shp=None):
+        # FIXME: issue a warning on non-integers
         if self.dtype == 'bool':
             return self._a
         ind = (self._a - 1).T.astype('i4')
@@ -865,13 +868,21 @@ class _mslice(mvar):
                 value += self.step
     
     def __getitem__(self, i):
-        self.init_data()
-        na = self._a.__getitem__(i)
-        return _marray('double', na.shape[::-1], na.reshape(na.shape[::-1]))
+        val = self.start + self.step*i
+        if val > self.stop:
+            raise OMPCException('Index exceeds matrix dimensions!')
+        return val
+#         self.init_data()
+#         na = self._a.__getitem__(i)
+#         return _marray('double', na.shape[::-1], na.reshape(na.shape[::-1]))
     
     def __getitem1__(self, i):
-        self.init_data()
-        return _marray('double', self.msize, self._a).__getitem1__(i)
+        val = self.start + self.step*(i-1)
+        if val > self.stop:
+            raise OMPCException('Index exceeds matrix dimensions!')
+        return val
+#         self.init_data()
+#         return _marray('double', self.msize, self._a).__getitem1__(i)
     
     def __len__(self):
         if self.stop is end:
@@ -1318,6 +1329,113 @@ def magic(n):
         I = k + 1
         A([I,I+m],I).lvalue = A([I+m,I],I)
     return A
+
+import scipy.io
+_loadmat = scipy.io.loadmat
+@_ompc_base
+def load(*X):
+    X = list(X)
+    format = None
+    re = []
+    vars = []
+    if X[0].strip()[0] == '-':
+        op = X.pop(0).strip()
+        if op.lower() == '-ascii': format = 'a'
+        elif op.lower() == '-mat': format = 'm'
+        else: raise OMPCException('Unknown option "%s".'%op)
+    # next must be filename
+    fname = X.pop(0)
+    base, ext = os.path.splitext(fname)
+    if not ext:
+        if os.path.exists(fname):
+            format = 'a'
+        else:
+            ext = '.mat'
+            fname += ext
+            format = 'm'
+    if not os.path.exists(fname):
+        raise OMPCException('Cannot find file "%s"!'%fname)
+    # variables
+    if len(X) > 0:
+        if X[0].strip()[0] == '-':
+            # regexp
+            op = X.pop(0).strip().lower()
+            if not op == '-regexp':
+                raise OMPCException('Unknown option "%s".'%op)
+            re = X
+        else:
+            vars = X
+    # load
+    if format == 'm':
+        try: f = _loadmat(fname, matlab_compatible=True)
+        except: raise OMPCException('Cannor open "%s" as an M-file!!'%fname)
+        data = []
+        if vars:
+            data = [ (k, v) for k, v in d if k in vars ]
+        elif re:
+            raise NotImplementedError()
+        else:
+            data = [ (k, v) for k, v in d if k[:2] != '__' ]
+        # populate the workspace
+        import inspect
+        cf = inspect.currentframe()
+        for var, val in data:
+            na = np.asfortranarray(val).T
+            cf.f_back.f_globals[var] = \
+                    _marray(_numpy2dtype[na.dtype], na.shape[::-1], na)
+    else:
+        # ASCII
+        try: f = file(fname, 'rU')
+        except: raise OMPCException('Cannor open "%s"!'%fname)
+        data = []
+        for x in f:
+            x = x.strip()
+            if x.startswith('%'): continue
+            data += [ map(float, x.split()) ]
+        na = np.asfortranarray(data, 'f8').T
+        import inspect
+        cf = inspect.currentframe()
+        base = os.path.basename(base)
+        cf.f_back.f_globals[base] = _marray('double', na.shape[::-1], na)
+
+# _ompc_base
+# def save(*X):
+#     import inspect
+#     f = inspect.currentframe()
+#     d = {}
+#     for var in args:
+#         d[var] = f.f_back.f_globals[var]
+#     _savemat(fname, d)
+
+@_ompc_base
+def length(X):
+    return len(X)
+
+_fft = np.fft.fft
+@_ompc_base
+def fft(X,N=mcat([]),axis=None):
+    if axis is not None: axis = len(X.msize) - i - 1
+    if len(X.msize) == 2:
+        if X.msize[0] == 1:
+            X = X._a.reshape(-1)
+        else:
+            if axis is None: axis = len(X.msize)-1
+            X = X._a
+    elif len(X.msize) > 2:
+        if axis is None:
+            # first non-singleton dimension
+            for i in xrange(len(X.msize),-1,-1):
+                if X.msize[i] > 1: break
+            axis = i
+    else:
+        raise NotImplementedError("Less than 2D?")
+    # N
+    if isempty(N): N = X.shape[axis]
+    # do it
+    na = _fft(X, N, axis)
+    msize = na.shape[::-1]
+    if len(msize) < 2: msize = (msize, 1)
+    return _marray(_numpy2dtype[na.dtype], msize, na)
 
 class mhandle(_marray):
     def __init__(self, arg):
