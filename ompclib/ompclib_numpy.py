@@ -19,7 +19,7 @@ import pylab as mpl
 # array.
 # This decorator adds a function to the "toolbox-less" OMPC base library.
 __ompc_all__ = ['end', 'mslice', 'mstring', 'OMPCSEMI',
-                'OMPCException', 'elmul', 'elpow']
+                'OMPCException', 'elmul', 'elpow', 'eldiv', 'ldiv', 'elldiv']
 
 def _ompc_base(func):
     global __ompc_all__
@@ -42,6 +42,8 @@ _dtype2numpy = {'complex': 'complex128',
 _numpy2dtype = {}
 for k, v in _dtype2numpy.items():
     _numpy2dtype[np.dtype(v)] = k
+    _numpy2dtype[str(np.dtype(v))] = k
+    _numpy2dtype[v] = k
 
 # errors and warnings
 
@@ -95,12 +97,15 @@ class mvar(object):
                 'Class "%s" cannot be used as index!'%self.__class__)
     
     # FIXME: warn people about using numpy functions directly
-#     def __array__(self):
-#         print repr(self)
-#         print self
-#         raise NotImplementedError("At the moment using numpy functions " \
-#               "directly is not possible! Please read the documentation at " \
-#               "http://ompc.juricap.com/documentation/.")
+    def __array__(self):
+        print 'in __array__', repr(self)
+        print 'in __array__', self
+        raise NotImplementedError("At the moment using numpy functions " \
+              "directly is not possible! Please read the documentation at " \
+              "http://ompc.juricap.com/documentation/.")
+    
+    def __nonzero__(self):
+        return bool(np.any(self._a != 0))
 
 class _mview(mvar):
     def __init__(self, viewed, ins, linear):
@@ -290,7 +295,46 @@ def power(A, B):
     na = A**B
     return _marray(_numpy2dtype[na.dtype], na.shape[::-1], na)
 
-from numpy.linalg import matrix_power
+try:
+    from numpy.linalg import matrix_power
+except:
+    def matrix_power(M,n):
+        if len(M.shape) != 2 or M.shape[0] != M.shape[1]:
+            raise ValueError("input must be a square array")
+        if not issubdtype(type(n),int):
+            raise TypeError("exponent must be an integer")
+
+        from numpy.linalg import inv
+
+        if n==0:
+            M = M.copy()
+            M[:] = np.identity(M.shape[0])
+            return M
+        elif n<0:
+            M = inv(M)
+            n *= -1
+
+        result = M
+        if n <= 3:
+            for _ in range(n-1):
+                result = np.dot(result, M)
+            return result
+
+        # binary decomposition to reduce the number of Matrix
+        # multiplications for n > 3.
+        beta = np.binary_repr(n)
+        Z, q, t = M, 0, len(beta)
+        while beta[t-q-1] == '0':
+            Z = np.dot(Z,Z)
+            q += 1
+        
+        result = Z
+        for k in range(q+1,t):
+            Z = np.dot(Z,Z)
+            if beta[t-k-1] == '1':
+                result = np.dot(result,Z)
+        return result
+
 @_ompc_base
 def mpower(A, B):
     if len(A.msize) != 2:
@@ -304,17 +348,30 @@ def mpower(A, B):
     na = matrix_power(A.T, B)
     return _marray(_numpy2dtype[na.dtype], na.shape[::-1], na)
 
+_solve = np.linalg.solve
 @_ompc_base
 def mldivide(A, B):
+    # FIXME A, B have to be matrices
+    if A.msize[0] == A.msize[1]:
+        if isinstance(A, mvar): A = A._a
+        if isinstance(B, mvar): B = B._a
+        na = _solve(A, B)
+        msize = na.shape[::-1]
+        if len(msize) == 1: msize = (msize[0], 1)
+        return _marray(_numpy2dtype(na.dtype), msize, na.T)
+    else:
+        raise NotImplementedError()
     raise NotImplementedError()
 
 @_ompc_base
 def mrdivide(A, B):
-    raise NotImplementedError()
+    "A/B = (B.T\A.T).T"
+    return mldivide(B.T, A.T).T
+    # raise NotImplementedError()
 
 @_ompc_base
 def ldivide(A, B):
-    raise NotImplementedError()
+    return rdivide(B, A)
 
 @_ompc_base
 def rdivide(A, B):
@@ -554,6 +611,8 @@ def print_marray(A, ans=True):
     pre = ''
     if ans:
         pre = '\nans = \n'
+    if isempty(A):
+        pre += '\n  []'
     if len(A.msize) > 2:
         for i in _ndi(*[slice(0,x) for x in A.msize[2:]]):
             pre += '\n(:, :, %s)\n'%', '.join([str(x+1) for x in i])
@@ -697,7 +756,9 @@ class _marray(mvar):
     # element access
     def __iter__(self):
         #return (_marray(self.dtype, (1,1), x) for x in self._a.flat )
-        return iter(self._a.flat)#(_marray(self.dtype, (1,1), x) for x in self._a.flat )
+        #return iter(self._a.flat)#(_marray(self.dtype, (1,1), x) for x in self._a.flat )
+        return ( float(x) for x in self._a.flat )
+        #(_marray(self.dtype, (1,1), x) for x in self._a.flat )
     
     def __len__(self):
         return max(self.msize)
@@ -707,13 +768,15 @@ class _marray(mvar):
         if self.dtype == 'bool':
             return self._a
         ind = (self._a - 1).T.astype('i4')
-        if ind.ndim == 2 and ind.shape[0] == 1:
-            ind = ind[0]
+        if ind.ndim == 2 and ind.shape[0] == 1 or ind.shape[1] == 1:
+            ind = ind.reshape(-1)
+        # if ind.ndim == 2 and ind.shape[0] == 1:
+        #     ind = ind[0]
         return ind
     
     def __getitem__(self, i):
         # determine the size of the new array
-        #if not hasattr(i, '__len__'): i = [i]
+        if not hasattr(i, '__len__'): i = [i]
         nshp = _ndshape(self.msize, *i)
         #return _marray(self.dtype, nshp, self._a.__getitem__(reversed(i)))
         return _marray(self.dtype, nshp, self._a.__getitem__(i[::-1]))
@@ -727,12 +790,15 @@ class _marray(mvar):
         nshp = _ndshape1(self.msize, *i)
         ri = []
         if len(i) == 1:
-            if self.msize[0] == 1: ri = (i[0]._a.astype('i4').reshape(-1)-1, 0)
-            elif self.msize[1] == 1: ri = (0, i[0]._a.astype('i4').reshape(-1)-1)
+            i = i[0]
+            if self.msize[0] == 1: ri = (i.__base0__(self.msize[1]), 0)
+            elif self.msize[1] == 1: ri = (0, i.__base0__(self.msize[0]))
             else:
                 # access to a flat array
-                self._a.flat
-                raise NotImplementedError()
+                msize = _size(i)
+                if isinstance(i, mvar): i = i.__base0__(len(self._a.flat))
+                na = self._a.flat[i]
+                return _marray(self.dtype, msize, na.reshape(msize[::-1]))
         else:
             di = len(self.msize)-1
             for x in reversed(i):
@@ -753,14 +819,19 @@ class _marray(mvar):
         if len(i) == 1:
             # stupid numpy a = rand(1,10); b = rand(1,2); a[0,[3,4]] = b
             # doesn't work
+            i = i[0]
             if self.msize[0] == 1:
-                ri = (i[0]._a.astype('i4').reshape(-1)-1, 0)
+                ri = (i.__base0__(self.msize[1]), 0)
                 val = val[0]
             elif self.msize[1] == 1:
-                ri = (0, i[0]._a.astype('i4').reshape(-1)-1)
+                ri = (0, i.__base0__(self.msize[0]))
                 val = val[0]
             else:
-                raise NotImplementedError()
+                # access to a flat array
+                msize = _size(i)
+                if isinstance(i, mvar): i = i.__base0__(len(self._a.flat))
+                self._a.flat[i] = val
+                return
         else:
             di = len(self.msize)-1
             for x in reversed(i):
@@ -871,7 +942,7 @@ class _mslice(mvar):
         val = self.start + self.step*i
         if val > self.stop:
             raise OMPCException('Index exceeds matrix dimensions!')
-        return val
+        return float(val)
 #         self.init_data()
 #         na = self._a.__getitem__(i)
 #         return _marray('double', na.shape[::-1], na.reshape(na.shape[::-1]))
@@ -880,7 +951,7 @@ class _mslice(mvar):
         val = self.start + self.step*(i-1)
         if val > self.stop:
             raise OMPCException('Index exceeds matrix dimensions!')
-        return val
+        return float(val)
 #         self.init_data()
 #         return _marray('double', self.msize, self._a).__getitem1__(i)
     
@@ -1005,8 +1076,9 @@ def _m_constructor_args(*X):
     if type(X[-1]) is str:
         dtype = X[-1]
         X = X[:-1]
-    if len(X) == 1 and isSequenceType(X):
+    if len(X) == 1:# and isSequenceType(X):
         X = X[0]
+        #X = X[0], X[0]
     return X, dtype
 
 @_ompc_base
@@ -1026,6 +1098,17 @@ def ones(*X):
     # check for class
     X, dt = _m_constructor_args(*X)
     return _marray.ones(X, dt)
+
+@_ompc_base
+def eye(*X):
+    if len(X) == 0:
+        return _marray.ones((1,1), 'double')
+    # check for class
+    X, dt = _m_constructor_args(*X)
+    kw = dict(dtype=_dtype2numpy[dt])
+    if not hasattr(X, '__len__'): X = (X,)
+    na = np.eye(*X[::-1], **kw)
+    return _marray(dt, na.shape[::-1], na)
 
 @_ompc_base
 def mcat(i):
@@ -1078,8 +1161,8 @@ def mcat(i):
     out = empty((final_rows, final_cols), 'double')
     for sl, x in _izip(pos, i):
         if x is not Ellipsis:
-            if isinstance(x, _marray): x = x._a.T
-            out._a.T.__setitem__(sl, x)
+            if isinstance(x, mvar): x = x._a
+            out._a.__setitem__(sl[::-1], x)
             #out._a.reshape(final_cols, final_rows).T.__setitem__(sl, x)
     return out
 
@@ -1089,6 +1172,8 @@ def who(*args,**kwargs):
     ns = __main__.__dict__
     vars = [ x for x in ns \
                 if isinstance(ns[x], mvar) and x[0] != '_' ]
+    if args:
+        vars = [ x for x in vars if x in args ]
     vars.sort()
     
     if nargout == 0:
@@ -1098,13 +1183,15 @@ def who(*args,**kwargs):
         return mcellarray(vars)
 
 @_ompc_base
-def whos(*args,**kwargs):
+def whos(*args, **kwargs):
     """Return list of variables in the current workspace."""
     nargin, nargout = _get_narginout(0)
     import __main__
     ns = __main__.__dict__
     vars = [ x for x in ns \
                 if isinstance(ns[x], mvar) and x[0] != '_' ]
+    if args:
+        vars = [ x for x in vars if x in args ]
     vars.sort()
     
     if nargout == 0:
@@ -1152,6 +1239,18 @@ def reshape(A, *newsize):
     out.msize = newsize
     out._a = out._a.reshape(newsize[::-1])
     return out
+
+@_ompc_base
+def fliplr(X):
+    if X._a.ndim != 2:
+        error('X must be a 2-D matrix.')
+    return _marray(X.dtype, X.msize, np.flipud(X._a))
+
+@_ompc_base
+def flipud(X):
+    if X._a.ndim != 2:
+        error('X must be a 2-D matrix.')
+    return _marray(X.dtype, X.msize, np.fliplr(X._a))
 
 @_ompc_base
 def sum(A, *dimtype):
@@ -1267,9 +1366,19 @@ def ceil(X):
 def fix(X):
     return _marray('double', X.msize, np.fix(X._a))
 
+def _what(X):
+    if isinstance(X, mvar):
+        return X.dtype, X.msize
+    elif isinstance(X, int):
+        return 'int32', (1, 1)
+    elif isinstance(X, float):
+        return 'double', (1, 1)
+    else:
+        raise NotImplementedError()
+
 @_ompc_base
-def mod(X,i):
-    dtype, msize = X.dtype, X.msize
+def mod(X, i):
+    dtype, msize = _what(X)
     if isinstance(X, mvar): X = X._a
     if isinstance(i, mvar):
         if i.msize != msize:
@@ -1278,10 +1387,8 @@ def mod(X,i):
     if i == 0:
         return _marray(dtype, msize, X)
     elif np.all(X == i):
-        print '3'
-        return zeros(X.msize, X.dtype)
+        return zeros(msize, dtype)
     na = np.mod(X, i)
-    print na, i, X
     return _marray(_numpy2dtype[na.dtype], msize, na)
 
 @_ompc_base
@@ -1300,7 +1407,6 @@ def magic(n):
     if n == 0:
         return marray([])
     elif mod (n, 2) == 1:
-        import ompc
         n = 3
         shift = floor ((mslice[0:n*n-1])/n)
         c = mod(mslice[1:n*n] - shift + (n-3)/2, n)
@@ -1330,8 +1436,8 @@ def magic(n):
         A([I,I+m],I).lvalue = A([I+m,I],I)
     return A
 
+from os.path import normpath as _normpath
 import scipy.io
-_loadmat = scipy.io.loadmat
 @_ompc_base
 def load(*X):
     X = list(X)
@@ -1353,6 +1459,8 @@ def load(*X):
             ext = '.mat'
             fname += ext
             format = 'm'
+    elif ext == '.mat':
+        format = 'm'
     if not os.path.exists(fname):
         raise OMPCException('Cannot find file "%s"!'%fname)
     # variables
@@ -1365,28 +1473,31 @@ def load(*X):
             re = X
         else:
             vars = X
+    fname = _normpath(fname)
     # load
     if format == 'm':
-        try: f = _loadmat(fname, matlab_compatible=True)
-        except: raise OMPCException('Cannor open "%s" as an M-file!!'%fname)
+        # scipy makes imports really slow
+        _loadmat = scipy.io.loadmat
+        try: d = _loadmat(fname, matlab_compatible=True)
+        except: raise OMPCException('Cannot open "%s" as an M-file!!'%fname)
         data = []
         if vars:
-            data = [ (k, v) for k, v in d if k in vars ]
+            data = [ (k, v) for k, v in d.items() if k in vars ]
         elif re:
             raise NotImplementedError()
         else:
-            data = [ (k, v) for k, v in d if k[:2] != '__' ]
+            data = [ (k, v) for k, v in d.items() if k[:2] != '__' ]
         # populate the workspace
         import inspect
         cf = inspect.currentframe()
         for var, val in data:
             na = np.asfortranarray(val).T
             cf.f_back.f_globals[var] = \
-                    _marray(_numpy2dtype[na.dtype], na.shape[::-1], na)
+                    _marray(_numpy2dtype[str(na.dtype)], na.shape[::-1], na)
     else:
         # ASCII
         try: f = file(fname, 'rU')
-        except: raise OMPCException('Cannor open "%s"!'%fname)
+        except: raise OMPCException('Cannot open "%s"!'%fname)
         data = []
         for x in f:
             x = x.strip()
@@ -1607,3 +1718,11 @@ def grid(*args):
         ha = ha.get_axes()
     ha.grid(b)
     mpl.draw()
+
+@_ompc_base
+def title(*args):
+    mpl.title(args)
+
+@_ompc_base
+def legend(*args):
+    mpl.legend(args)
