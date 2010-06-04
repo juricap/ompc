@@ -312,11 +312,19 @@ def install():
 # populate the __main__ namespace with OMPCbase functions
 import __main__
 if not hasattr(__main__, '__OMPC'):
-    import ompclib
+    import ompclib, warnings
     _ns = __main__
     # IPython needs special treatment
-    if hasattr(_ns, '__IP'):
-        _ns = _ns.__IP.user_ns
+    if 'IPython' in sys.modules:
+        if hasattr(__main__, '__IP'):
+            _ns = __main__.__IP.user_ns
+        else:
+            import __builtin__
+            if hasattr(__builtin__, '__IPYTHON__'):
+                _ns = __builtin__.__IPYTHON__.user_ns
+            else:
+                warnings.warn("IPython seems to be running, but I can't find it! Populating the __main__ namespace.", UserWarning)
+                _ns = __main__.__dict__
     else:
         _ns = __main__.__dict__
     
